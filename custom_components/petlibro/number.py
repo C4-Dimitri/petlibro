@@ -70,7 +70,6 @@ class PetLibroNumberEntity(PetLibroEntity[_DeviceT], NumberEntity):
         """Set the value of the number."""
         _LOGGER.debug(f"Setting value {value} for {self.device.name}")
         try:
-            # Regular case for sound_level or other methods that only need a value
             _LOGGER.debug(f"Calling method with value={value} for {self.device.name}")
             await self.entity_description.method(self.device, value)
             _LOGGER.debug(f"Value {value} set successfully for {self.device.name}")
@@ -104,6 +103,18 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_step=1,
             value=lambda device: device.sound_level,
             method=lambda device, value: device.set_sound_level(value),
+            name="Sound Level"
+        ),
+        PetLibroNumberEntityDescription[OneRFIDSmartFeeder](
+            key="lid_close_delay",
+            translation_key="lid_close_delay",
+            icon="mdi:progress-clock",
+            native_unit_of_measurement="s",
+            native_max_value=10,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.lid_close_delay,
+            method=lambda device, value: device.set_lid_close_delay(value),
             name="Sound Level"
         )
     ]

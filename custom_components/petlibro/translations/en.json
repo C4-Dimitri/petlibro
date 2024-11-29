@@ -190,11 +190,17 @@
         "number": {
             "sound_level": {
                 "name": "Volume Level"
-            }
-        },
-        "number": {
+            },
             "desiccant_frequency": {
                 "name": "Desiccant Frequency"
+            }
+        },
+        "select": {
+            "lid_mode": {
+                "name": "Lid Mode"
+            },
+            "lid_speed": {
+                "name": "Lid Speed"
             }
         }
     }
