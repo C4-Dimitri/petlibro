@@ -164,3 +164,13 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
   > Only one device can be login at the same time.
   >
   > If you to wan to keep your phone connected, create another account for this integration and share your device to it.
+
+## Star History
+
+<a href="https://www.star-history.com/#jjjonesjr33/petlibro&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
+ </picture>
+</a>
