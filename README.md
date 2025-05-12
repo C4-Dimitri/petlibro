@@ -38,11 +38,8 @@
 #### This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
 > [!IMPORTANT]
   >* Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
-  >
   >* Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
-  >
   >* Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
-  >
   >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream.
 
 # NOTICE
