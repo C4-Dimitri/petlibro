@@ -4,6 +4,8 @@
 [![Become a Sponsor](https://img.shields.io/badge/Become%20a%20Sponsor-❤️-black)](https://github.com/sponsors/jjjonesjr33)
 [![Sponsors](https://img.shields.io/github/sponsors/jjjonesjr33?label=Sponsors)](https://github.com/sponsors/jjjonesjr33)
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
+> [!IMPORTANT]  
+> Before setting up the integration in Home Assistant, be sure to review the [Account Management](https://github.com/jjjonesjr33/petlibro/wiki/PetLibro-Account-Management) and [Password Limitations](https://github.com/jjjonesjr33/petlibro/wiki/PetLibro-Password-Limitation) sections in the wiki. This will help ensure a smooth and successful setup process.
 
 # PETLIBRO integration for Home Assistant
 
@@ -36,7 +38,7 @@
 
 # In Development
 #### This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
-> [!IMPORTANT]
+> [!NOTE]
   >* Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
   >* Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
   >* Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
