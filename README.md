@@ -4,16 +4,13 @@
 [![Become a Sponsor](https://img.shields.io/badge/Become%20a%20Sponsor-❤️-black)](https://github.com/sponsors/jjjonesjr33)
 [![Sponsors](https://img.shields.io/github/sponsors/jjjonesjr33?label=Sponsors)](https://github.com/sponsors/jjjonesjr33)
 ![Logo](https://raw.githubusercontent.com/jjjonesjr33/ha_petlibro/master/docs/media/logo.png)
+> [!IMPORTANT]  
+> Before setting up the integration in Home Assistant, be sure to review the [Account Management](https://github.com/jjjonesjr33/petlibro/wiki/PetLibro-Account-Management) and [Password Limitations](https://github.com/jjjonesjr33/petlibro/wiki/PetLibro-Password-Limitation) sections in the wiki. This will help ensure a smooth and successful setup process.
 
 # PETLIBRO integration for Home Assistant
 
-## Have questions, or need support? We now have a [Wiki](https://github.com/jjjonesjr33/petlibro/wiki)!
-Or get ahold of me via direct message on discord - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001`
-
-Also if you want to check out all the other things I do follow me on my [**Socials**](https://jjjonesjr33.com/).
-
-## Supported Devices
-### This has been reworked to work with the following devices
+### Supported Devices
+#### This has been reworked to work with the following devices
 
 ### Feeders
 * Granary Smart Feeder (PLAF103) | Version 2
@@ -31,110 +28,28 @@ Also if you want to check out all the other things I do follow me on my [**Socia
 
 * If you have a device that you would like added please issue a [request](https://github.com/jjjonesjr33/petlibro/issues/new/choose).
 
-# Device Preview
+# Have questions, or need support?
+> [!TIP]
+>* Most answers can be found in our [Wiki](https://github.com/jjjonesjr33/petlibro/wiki)
+> and if they can't, try the [Discussions](https://github.com/jjjonesjr33/petlibro/discussions)
+>* Or get ahold of me via direct message on [Discord](https://discord.com/invite/3hkWMry) - `Jamie Jones Jr` / `jjjonesjr33` previously  `JJJonesJr33#0001`
 
-## One RFID Smart Feeder (PLAF301) Features
-Device Information
-
-    Model
-    Manufacturer
-    Firmware Version
-
-Features & Sensors
-
-    Battery Status
-    Buttons Lock
-    Desiccant Remaining Days
-    Device SN
-    Display Status
-    Food Dispenser Status
-    Food Status
-    Lid Status
-    MAC Address
-    Sleep Mode
-    Sound Status
-
-Feeding Statistics
-
-    Today's Eating Times
-    Today's Feeding Plan
-    Today's Feeding Quantity
-    Today's Feeding Times
-    Today's Total Eating Time
-
-Connectivity
-
-    Wi-Fi Status
-    Wi-Fi Signal Strength
-    Wi-Fi SSID
-
-Configuration Options
-
-    Desiccant Replaced
-    Disable Feeding Plan
-    Enable Feeding Plan
-    Manual Feed
-    Manually Open Lid
-    Turn Off Display
-    Turn On Display
-    Turn Off Sound
-    Turn On Sound
-
-Controls
-    Desiccant Frequency
-    Volume Level
-    
-## One RFID Smart Feeder Preview
-![One RFID Smart Feeder](https://github.com/user-attachments/assets/0636003e-04ab-495c-8f28-d032610c9b19)
-
-## Dockstream Smart RFID (PLWF305) Features
-Device Information
-
-    Model
-    Manufacturer
-    Firmware Version
-    Hardware Version
-
-Features & Sensors
-
-    Current Weight
-    Device Serial Number
-    MAC Address
-    Remaining Cleaning Days
-    Remaining Filter Day
-    Remaining Water
-    Water Interval
-    Water Time Duration
-
-Connectivity
-
-    Wi-Fi Status
-    Wi-Fi Signal Strength
-    Wi-Fi SSID
-
-## Dockstream RFID Smart Fountain Preview
-![Dockstream RFID Smart Fountain](https://github.com/user-attachments/assets/45622291-5eae-4a83-87ea-b98a8749b8f8)
+#### Also if you want to check out all the other things I do follow me on my [**Socials**](https://jjjonesjr33.com/).
 
 # In Development
-* This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
-- Features missing, but in the works.
-
-  > Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
-
-  > Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
-
-  > Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
-
-  > Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream.
+#### This is still a WIP integration, features may or may not be removed at any time. If you have suggestions please let me know.
+> [!NOTE]
+  >* Buttons to reset Cleaning/Filter/Desiccant - (PLAF103), (PLAF203), (PLAF301), (PLWF105), (PLWF305)
+  >* Switches to be added - Child Lock/Button Lock, Screen/Display, and Volume - (PLAF103), (PLAF203), (PLAF301)
+  >* Tracking RFID per pet intance eat/drink - Both (PLAF301) & (PLWF305) - Currently missing the API to setup tracking.
+  >* Live camera feed for Granary Smart Camera Feeder (PLAF203) - Currently missing the API to setup live stream.
 
 # NOTICE
-Alpha/Beta State Notice for this Plugin:
-
-When setting up for the first time, please sign in and allow 1-5 minutes for the login process and data retrieval to complete. If you do not see all the sensors and controls listed, you may need to refresh your web browser's cache.
-
-I recommend performing a full reboot of Home Assistant to ensure you are logged in and that the add-on has refreshed the data without any errors.
-
-  > The addon is programmed to update every 60 seconds.
+#### Alpha/Beta state notice for this plugin:
+> [!WARNING]
+>* When setting up for the first time, please sign in and allow 1-5 minutes for the login process and data retrieval to complete. If you do not see all the sensors and controls listed, you may need to refresh your web browser's cache.
+>* I recommend performing a full reboot of Home Assistant to ensure you are logged in and that the add-on has refreshed the data without any errors. 
+>* The addon is programmed to update every 60 seconds.
 
 ## Troubleshooting
 To troubleshoot your Home Assistant instance, you can add the following configuration to your configuration.yaml file:
@@ -164,3 +79,13 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
   > Only one device can be login at the same time.
   >
   > If you to wan to keep your phone connected, create another account for this integration and share your device to it.
+
+## Star History
+
+<a href="https://www.star-history.com/#jjjonesjr33/petlibro&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
+ </picture>
+</a>
