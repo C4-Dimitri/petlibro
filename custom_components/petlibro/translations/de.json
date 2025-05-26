@@ -162,6 +162,9 @@
             },
             "desiccant_reset": {
                 "name": "Trockenmittel gewechselt"
+            },
+            "reposition_schedule": {
+                "name": "Neupositionierung Futterplan"
             }
         },
         "binary_sensor": {

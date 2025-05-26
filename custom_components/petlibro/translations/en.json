@@ -171,6 +171,9 @@
             },
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
+            },
+            "reposition_schedule": {
+                "name": "Reposition Schedule"
             }
         },
         "binary_sensor": {

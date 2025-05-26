@@ -174,6 +174,12 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="rotate_food_bowl",
             set_fn=lambda device: device.rotate_food_bowl(),
             name="Rotate Food Bowl"
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="reposition_schedule",
+            translation_key="reposition_schedule",
+            set_fn=lambda device: device.reposition_schedule(),
+            name="Reposition the schedule"
         )
     ],
     SpaceSmartFeeder: [
