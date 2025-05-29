@@ -93,10 +93,6 @@ class OneRFIDSmartFeeder(Device):
         return self._data.get("realInfo", {}).get("unitType", 1)
 
     @property
-    def feeding_plan_today_data(self) -> str:
-        return self._data.get("getfeedingplantoday", {})
-
-    @property
     def battery_display_type(self) -> float:
         """Get the battery percentage state."""
         try:
@@ -204,6 +200,10 @@ class OneRFIDSmartFeeder(Device):
     def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
+    @property
+    def feeding_plan_today_data(self) -> str:
+        return self._data.get("getfeedingplantoday", {})
+
     @property
     def manual_feed_quantity(self):
         if self._manual_feed_quantity is None:

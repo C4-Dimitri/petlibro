@@ -188,10 +188,23 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return entity specific state attributes."""
         if self.entity_description.key == "feeding_plan_state":
             plans = self.device.feeding_plan_today_data.get("plans", [])
+            unit = getattr(self.device, "unit_type", "grains")
+            # Define conversion rates from 1 grain to each unit
+            conversions = {
+                UnitOfMass.GRAMS: 10,             # 1 grain ≈ 10 grams
+                UnitOfMass.OUNCES: 0.35274,        # 1 grain ≈ 0.35274 ounces
+                UnitOfVolume.MILLILITERS: 10,     # 1 grain ≈ 10 mL
+                "cups": 1 / 12                     # 1 grain ≈ 0.08 cups
+            }
+
+            # Resolve conversion factor
+            conversion_factor = conversions.get(unit, 0.25)
+            resolved_unit = unit if unit in conversions else "cups"
+
             return {
                 f"plan_{plan['index']}": {
                     "time": plan["time"],
-                    "grains": plan["grainNum"],
+                    "amount": f"{round(plan['grainNum'] * conversion_factor, 2)} {resolved_unit}",
                     "state": self._format_state(plan["state"]),
                     "repeat": plan["repeat"],
                     "planID": plan["planId"]
