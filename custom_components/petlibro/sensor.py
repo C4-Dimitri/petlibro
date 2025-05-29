@@ -183,6 +183,28 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             return device_class
         return super().device_class
 
+    @property
+    def extra_state_attributes(self):
+        """Return entity specific state attributes."""
+        if self.entity_description.key == "feeding_plan_state":
+            plans = self._device.feeding_plan_today_data.get("plans", [])
+            return {
+                f"plan_{plan['index']}": {
+                    "time": plan["time"],
+                    "grains": plan["grainNum"],
+                    "state": self._format_state(plan["state"]),
+                    "repeat": plan["repeat"]
+                }
+                for plan in plans
+            }
+    def _format_state(self, state):
+        return {
+            1: "Pending",
+            2: "Skipped",
+            3: "Completed",
+            4: "Skipped, Time Passed"
+        }.get(state, "Unknown")
+
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
     Feeder: [
