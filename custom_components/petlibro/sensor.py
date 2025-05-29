@@ -188,23 +188,28 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         """Return entity specific state attributes."""
         if self.entity_description.key == "feeding_plan_state":
             plans = self.device.feeding_plan_today_data.get("plans", [])
-            unit = getattr(self.device, "unit_type", "grains")
+            unit = getattr(self.device, "unit_type", None)
+
             # Define conversion rates from 1 grain to each unit
             conversions = {
                 UnitOfMass.GRAMS: 10,             # 1 grain ≈ 10 grams
-                UnitOfMass.OUNCES: 0.35274,        # 1 grain ≈ 0.35274 ounces
+                UnitOfMass.OUNCES: 0.35274,       # 1 grain ≈ 0.35274 ounces
                 UnitOfVolume.MILLILITERS: 10,     # 1 grain ≈ 10 mL
-                "cups": 1 / 12                     # 1 grain ≈ 0.08 cups
+                "cups": 1 / 12                    # 1 grain ≈ 0.0833 cups
             }
 
-            # Resolve conversion factor
-            conversion_factor = conversions.get(unit, conversions["cups"])
-            resolved_unit = (
-                "g" if unit == UnitOfMass.GRAMS else
-                "oz" if unit == UnitOfMass.OUNCES else
-                "mL" if unit == UnitOfVolume.MILLILITERS else
-                "cups"
-            )
+            # Determine conversion factor and unit label
+            if unit in conversions:
+                conversion_factor = conversions[unit]
+                resolved_unit = (
+                    "g" if unit == UnitOfMass.GRAMS else
+                    "oz" if unit == UnitOfMass.OUNCES else
+                    "mL" if unit == UnitOfVolume.MILLILITERS else
+                    "cups"
+                )
+            else:
+                conversion_factor = conversions["cups"]
+                resolved_unit = "cups"
 
             return {
                 f"plan_{plan['index']}": {
@@ -216,6 +221,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                 }
                 for plan in plans
             }
+
     def _format_state(self, state):
         return {
             1: "Pending",
