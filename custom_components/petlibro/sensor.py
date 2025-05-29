@@ -193,7 +193,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     "time": plan["time"],
                     "grains": plan["grainNum"],
                     "state": self._format_state(plan["state"]),
-                    "repeat": plan["repeat"]
+                    "repeat": plan["repeat"],
+                    "planID": plan["planId"]
                 }
                 for plan in plans
             }
