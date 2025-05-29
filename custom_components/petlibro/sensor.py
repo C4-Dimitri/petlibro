@@ -187,7 +187,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
         if self.entity_description.key == "feeding_plan_state":
-            plans = self._device.feeding_plan_today_data.get("plans", [])
+            plans = self.device.feeding_plan_today_data.get("plans", [])
             return {
                 f"plan_{plan['index']}": {
                     "time": plan["time"],
