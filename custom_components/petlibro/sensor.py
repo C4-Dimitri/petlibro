@@ -198,8 +198,13 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             }
 
             # Resolve conversion factor
-            conversion_factor = conversions.get(unit, 0.25)
-            resolved_unit = unit if unit in conversions else "cups"
+            conversion_factor = conversions.get(unit, conversions["cups"])
+            resolved_unit = (
+                "g" if unit == UnitOfMass.GRAMS else
+                "oz" if unit == UnitOfMass.OUNCES else
+                "mL" if unit == UnitOfVolume.MILLILITERS else
+                "cups"
+            )
 
             return {
                 f"plan_{plan['index']}": {
