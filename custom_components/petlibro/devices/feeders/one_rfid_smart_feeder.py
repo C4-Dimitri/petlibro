@@ -25,13 +25,15 @@ class OneRFIDSmartFeeder(Device):
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
+            get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
-                "getDefaultMatrix": get_default_matrix or {}
+                "getDefaultMatrix": get_default_matrix or {},
+                "getfeedingplantoday": get_feeding_plan_today or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -198,6 +200,10 @@ class OneRFIDSmartFeeder(Device):
     def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
+    @property
+    def feeding_plan_today_data(self) -> str:
+        return self._data.get("getfeedingplantoday", {})
+
     @property
     def manual_feed_quantity(self):
         if self._manual_feed_quantity is None:
