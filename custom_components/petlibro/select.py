@@ -99,6 +99,10 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Dog": 6,
                 "Cat": 7,
                 "Elk": 8,
+            },
+            "water_dispensing_mode": {
+                "Flowing Water (Constant)": 0,
+                "Intermittent Water (Scheduled)": 1,
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
