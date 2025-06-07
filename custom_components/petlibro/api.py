@@ -531,7 +531,7 @@ class PetLibroAPI:
         try:
             # Generate a dynamic request ID for the mode switch.
             request_id = str(uuid.uuid4()).replace("-", "")
-            response = await self.session.post("/device/setting/waterModeSetting", json={
+            response = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "requestId": request_id,
                 "useWaterType": value,
