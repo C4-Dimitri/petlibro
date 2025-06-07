@@ -140,7 +140,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
         )
     ],
     DockstreamSmartRFIDFountain: [
-        PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
+        PetLibroSelectEntityDescription[DockstreamSmartRFIDFountain](
             key="water_dispensing_mode",
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
@@ -151,7 +151,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
         ), 
     ],
     DockstreamSmartFountain: [
-        PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
+        PetLibroSelectEntityDescription[DockstreamSmartFountain](
             key="water_dispensing_mode",
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
