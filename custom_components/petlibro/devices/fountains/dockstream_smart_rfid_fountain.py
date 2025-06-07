@@ -148,6 +148,32 @@ class DockstreamSmartRFIDFountain(Device):
             raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
 
     @property
+    def water_interval(self) -> float:
+        return self._data.get("realInfo", {}).get("useWaterInterval", 0)
+
+    async def set_water_interval(self, value: float) -> None:
+        _LOGGER.debug(f"Setting water interval to {value} for {self.serial}")
+        try:
+            await self.api.set_water_interval(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set water interval for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting water interval: {err}")
+
+    @property
+    def water_dispensing_duration(self) -> float:
+        return self._data.get("realInfo", {}).get("useWaterDuration", 0)
+
+    async def set_water_dispensing_duration(self, value: float) -> None:
+        _LOGGER.debug(f"Setting water dispensing duration to {value} for {self.serial}")
+        try:
+            await self.api.set_water_dispensing_duration(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set water dispensing duration for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting water dispensing duration: {err}")
+
+    @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""
         return self._data.get("realInfo", {}).get("todayTotalMl", 0)

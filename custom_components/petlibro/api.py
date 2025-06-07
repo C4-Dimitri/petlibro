@@ -509,6 +509,44 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
             raise
 
+    async def set_water_interval(self, serial: str, value: float):
+        """Set the water interval."""
+        _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": None,
+                "useWaterInterval": value,
+                "useWaterDuration": None
+            })
+            _LOGGER.debug(f"Water interval set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water interval for device {serial}: {e}")
+            raise
+
+    async def set_water_dispensing_duration(self, serial: str, value: float):
+        """Set the water interval."""
+        _LOGGER.debug(f"Setting water dispensing duration: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": None,
+                "useWaterInterval": None,
+                "useWaterDuration": value
+            })
+            _LOGGER.debug(f"Water dispensing duration set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
+            raise
+
     async def set_lid_mode(self, serial: str, value: str):
         """Set the lid mode."""
         _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
