@@ -155,7 +155,7 @@ class DockstreamSmartRFIDFountain(Device):
         _LOGGER.debug(f"Setting water interval to {value} for {self.serial}")
         try:
             current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
-            await self.api.set_water_interval(self.serial, value)
+            await self.api.set_water_interval(self.serial, value, current_mode)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water interval using {current_mode} for {self.serial}: {err}")
