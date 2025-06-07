@@ -228,6 +228,9 @@
             },
             "display_icon": {
                 "name": "Icon on Display"
+            },
+            "water_dispensing_mode": {
+                "name": "Water Dispensing Mode"
             }
         },
         "text": {
