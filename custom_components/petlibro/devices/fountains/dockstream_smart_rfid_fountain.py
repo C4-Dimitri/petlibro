@@ -126,14 +126,14 @@ class DockstreamSmartRFIDFountain(Device):
         await self.refresh()
     
     @property
-    def water_dispensing_mode(self) -> str:
+    def water_dispensing_mode(self) -> int:
         """Return the user-friendly water dispensing mode (mapped directly from the API value)."""
-        api_value = self._data.get("realInfo", {}).get("useWaterType", "0")
+        api_value = self._data.get("realInfo", {}).get("useWaterType", 0)
         
         # Direct mapping inside the property
-        if api_value == "0":
+        if api_value == 0:
             return "Flowing Water (Constant)"
-        elif api_value == "1":
+        elif api_value == 1:
             return "Intermittent Water (Scheduled)"
         else:
             return "Unknown"
