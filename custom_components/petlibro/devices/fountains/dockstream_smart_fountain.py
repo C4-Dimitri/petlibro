@@ -171,7 +171,7 @@ class DockstreamSmartFountain(Device):
         try:
             current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
             current_interval = self._data.get("realInfo", {}).get("useWaterInterval", 0)
-            await self.api.set_water_dispensing_duration(self.serial, value, current_interval)
+            await self.api.set_water_dispensing_duration(self.serial, value, current_mode, current_interval)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water dispensing duration using {current_mode} & {current_interval} for {self.serial}: {err}")
