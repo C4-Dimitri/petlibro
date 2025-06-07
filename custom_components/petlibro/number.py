@@ -212,7 +212,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
         ),
     ],
     DockstreamSmartRFIDFountain: [
-        PetLibroNumberEntityDescription[DockstreamSmartFountain](
+        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
             key="water_interval",
             translation_key="water_interval",
             icon="mdi:timer",
@@ -224,7 +224,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: device.set_water_interval(value),
             name="Water Interval"
         ),
-        PetLibroNumberEntityDescription[DockstreamSmartFountain](
+        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
             key="water_dispensing_duration",
             translation_key="water_dispensing_duration",
             icon="mdi:timer",
