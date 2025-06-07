@@ -509,7 +509,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
             raise
 
-    async def set_water_interval(self, serial: str, value: float):
+    async def set_water_interval(self, serial: str, value: float, current_mode: int):
         """Set the water interval."""
         _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")
         try:
@@ -518,7 +518,7 @@ class PetLibroAPI:
             response = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "requestId": request_id,
-                "useWaterType": None,
+                "useWaterType": current_mode,
                 "useWaterInterval": value,
                 "useWaterDuration": None
             })
@@ -528,7 +528,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water interval for device {serial}: {e}")
             raise
 
-    async def set_water_dispensing_duration(self, serial: str, value: float):
+    async def set_water_dispensing_duration(self, serial: str, value: float, current_mode: int):
         """Set the water interval."""
         _LOGGER.debug(f"Setting water dispensing duration: serial={serial}, value={value}")
         try:
@@ -537,7 +537,7 @@ class PetLibroAPI:
             response = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "requestId": request_id,
-                "useWaterType": None,
+                "useWaterType": current_mode,
                 "useWaterInterval": None,
                 "useWaterDuration": value
             })

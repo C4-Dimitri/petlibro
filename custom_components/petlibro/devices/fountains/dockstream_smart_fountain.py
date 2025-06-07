@@ -154,11 +154,12 @@ class DockstreamSmartFountain(Device):
     async def set_water_interval(self, value: float) -> None:
         _LOGGER.debug(f"Setting water interval to {value} for {self.serial}")
         try:
+            current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
             await self.api.set_water_interval(self.serial, value)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water interval for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water interval: {err}")
+            _LOGGER.error(f"Failed to set water interval using {current_mode} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting water interval using {current_mode}: {err}")
 
     @property
     def water_dispensing_duration(self) -> float:
@@ -167,11 +168,12 @@ class DockstreamSmartFountain(Device):
     async def set_water_dispensing_duration(self, value: float) -> None:
         _LOGGER.debug(f"Setting water dispensing duration to {value} for {self.serial}")
         try:
-            await self.api.set_water_dispensing_duration(self.serial, value)
+            current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
+            await self.api.set_water_dispensing_duration(self.serial, value, current_mode)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing duration for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing duration: {err}")
+            _LOGGER.error(f"Failed to set water dispensing duration using {current_mode} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting water dispensing duration using {current_mode}: {err}")
 
     @property
     def today_total_ml(self) -> int:
