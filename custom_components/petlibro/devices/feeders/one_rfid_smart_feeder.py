@@ -205,25 +205,26 @@ class OneRFIDSmartFeeder(Device):
     
     @property
     def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output."""
-        work_record = self._data.get("workRecord", {})
-        _LOGGER.debug("Raw workRecord: %s", work_record)
-        _LOGGER.debug("Type of workRecord: %s", type(work_record))
-        records_data = work_record.get("data", [])
+        """Return the recordTime of the last successful grain output as a formatted string."""
+        raw = self._data.get("workRecord", [])
 
-        if not records_data:
+        # Log raw to help debug
+        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
+
+        if not raw or not isinstance(raw, list):
             return None
 
-        work_records = records_data[0].get("workRecords", [])
-        for record in work_records:
-            if record.get("type") == "GRAIN_OUTPUT_SUCCESS": # May need different type for different feeders.
-                timestamp_ms = record.get("recordTime", 0)
-                if timestamp_ms:
-                    dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                    return dt.strftime("%Y-%m-%d %H:%M:%S")
+        for day_entry in raw:
+            work_records = day_entry.get("workRecords", [])
+            for record in work_records:
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    timestamp_ms = record.get("recordTime", 0)
+                    if timestamp_ms:
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                        return dt.strftime("%Y-%m-%d %H:%M:%S")
 
         return None
-
+    
     @property
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
