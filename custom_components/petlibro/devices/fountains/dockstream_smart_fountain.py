@@ -119,11 +119,6 @@ class DockstreamSmartFountain(Device):
         """Enable or disable the sound."""
         await self.api.set_sound_switch(self.serial, value)
         await self.refresh()
-    
-    async def set_manual_cleaning(self):
-        """Trigger manual cleaning action."""
-        await self.api.set_manual_cleaning(self.serial)
-        await self.refresh()
 
     @property
     def water_dispensing_mode(self) -> int:
@@ -176,6 +171,52 @@ class DockstreamSmartFountain(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water dispensing duration using {current_mode} & {current_interval} for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting water dispensing duration using {current_mode} & {current_interval}: {err}")
+
+    @property
+    def cleaning_frequency(self) -> float:
+        return self._data.get("realInfo", {}).get("machineCleaningFrequency", 0)
+
+    async def set_cleaning_frequency(self, value: float) -> None:
+        _LOGGER.debug(f"Setting machine cleaning frequency to {value} for {self.serial}")
+        try:
+            key = "MACHINE_CLEANING"
+            await self.api.set_filter_frequency(self.serial, value, key)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set machine cleaning frequency using {key} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting machine cleaning frequency using {key}: {err}")
+
+    @property
+    def filter_frequency(self) -> float:
+        return self._data.get("realInfo", {}).get("filterReplacementFrequency", 0)
+
+    async def set_filter_frequency(self, value: float) -> None:
+        _LOGGER.debug(f"Setting filter frequency to {value} for {self.serial}")
+        try:
+            key = "FILTER_ELEMENT"
+            await self.api.set_filter_frequency(self.serial, value, key)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set filter frequency using {key} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting filter frequency using {key}: {err}")
+
+    async def set_cleaning_reset(self) -> None:
+        _LOGGER.debug(f"Triggering machine cleaning reset for {self.serial}")
+        try:
+            await self.api.set_cleaning_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+    async def set_filter_reset(self) -> None:
+        _LOGGER.debug(f"Triggering filter reset for {self.serial}")
+        try:
+            await self.api.set_filter_reset(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger filter reset for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering filter reset: {err}")
 
     @property
     def today_total_ml(self) -> int:

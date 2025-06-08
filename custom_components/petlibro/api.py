@@ -547,6 +547,48 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
+    async def set_cleaning_frequency(self, serial: str, value: float, key = str) -> JSON:
+        """Set the machine cleaning frequency."""
+        _LOGGER.debug(f"Setting machine cleaning frequency: serial={serial}, value={value}, key={key}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                    "deviceSn": serial,
+                    "key": key,
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000
+                },
+            )
+            _LOGGER.debug(f"Machine cleaning frequency set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set machine cleaning frequency for device {serial}: {e}")
+            raise
+
+    async def set_filter_frequency(self, serial: str, value: float, key = str) -> JSON:
+        """Set the filter frequency."""
+        _LOGGER.debug(f"Setting filter frequency: serial={serial}, value={value}, key={key}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                    "deviceSn": serial,
+                    "key": key,
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000
+                },
+            )
+            _LOGGER.debug(f"Filter frequency set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set filter frequency for device {serial}: {e}")
+            raise
+
     async def set_lid_mode(self, serial: str, value: str):
         """Set the lid mode."""
         _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
