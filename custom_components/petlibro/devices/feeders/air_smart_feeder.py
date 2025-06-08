@@ -4,6 +4,7 @@ from typing import cast
 from logging import getLogger
 from ...exceptions import PetLibroAPIError
 from ..device import Device
+from datetime import datetime
 
 _LOGGER = getLogger(__name__)
 
