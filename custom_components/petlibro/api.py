@@ -314,18 +314,16 @@ class PetLibroAPI:
         now = datetime.utcnow()
         last_call_time = self._last_api_call_times.get(f"{device_id}_work_record")
 
-        # If we made the request within the last 10 seconds, return cached response
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
             _LOGGER.debug(f"Skipping workRecord request for {device_id}, using cached response.")
             return self._cached_responses.get(f"{device_id}_work_record", {})
 
-        # Otherwise, make the API call and update cache
         try:
-            now = datetime.utcnow()
             thirty_days_ago = now - timedelta(days=30)
             start_time = int(thirty_days_ago.timestamp() * 1000)
             end_time = int(now.timestamp() * 1000)
-            response = await self.session.request("POST", "/device/workRecord/list", json={
+
+            response_data = await self.session.request("POST", "/device/workRecord/list", json={
                 "deviceSn": device_id,
                 "startTime": start_time,
                 "endTime": end_time,
@@ -333,13 +331,19 @@ class PetLibroAPI:
                 "type": ["GRAIN_OUTPUT_SUCCESS"]
             })
 
-            json_data = await response.json()
 
-            # Store the time of the API call and the parsed JSON response
+            # Ensure it's a proper dict (not a raw aiohttp response or an unwrapped list)
+            if isinstance(response_data, dict):
+                parsed = response_data
+            else:
+                # If it's an aiohttp.ClientResponse or similar, parse explicitly
+                parsed = await response_data.json()
+
+            # Save and return
             self._last_api_call_times[f"{device_id}_work_record"] = now
-            self._cached_responses[f"{device_id}_work_record"] = json_data
+            self._cached_responses[f"{device_id}_work_record"] = parsed
 
-            return json_data
+            return parsed
         except Exception as e:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
