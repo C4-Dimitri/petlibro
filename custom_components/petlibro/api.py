@@ -323,6 +323,7 @@ class PetLibroAPI:
             start_time = int(thirty_days_ago.timestamp() * 1000)
             end_time = int(now.timestamp() * 1000)
 
+            # Make the actual POST request
             response_data = await self.session.request("POST", "/device/workRecord/list", json={
                 "deviceSn": device_id,
                 "startTime": start_time,
@@ -331,19 +332,16 @@ class PetLibroAPI:
                 "type": ["GRAIN_OUTPUT_SUCCESS"]
             })
 
+            # Log and inspect what actually came back
+            _LOGGER.debug("Raw response_data from workRecord: %s", response_data)
+            _LOGGER.debug("Type of response_data: %s", type(response_data))
 
-            # Ensure it's a proper dict (not a raw aiohttp response or an unwrapped list)
-            if isinstance(response_data, dict):
-                parsed = response_data
-            else:
-                # If it's an aiohttp.ClientResponse or similar, parse explicitly
-                parsed = await response_data.json()
-
-            # Save and return
+            # Just save whatever we got — don't attempt .json()
             self._last_api_call_times[f"{device_id}_work_record"] = now
-            self._cached_responses[f"{device_id}_work_record"] = parsed
+            self._cached_responses[f"{device_id}_work_record"] = response_data
 
-            return parsed
+            return response_data
+
         except Exception as e:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
