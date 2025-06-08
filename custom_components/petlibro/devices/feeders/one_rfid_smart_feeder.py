@@ -36,7 +36,7 @@ class OneRFIDSmartFeeder(Device):
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
-                "workRecord": get_work_record or {}
+                "workRecord": get_work_record if get_work_record is not None else []
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
