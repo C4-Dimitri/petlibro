@@ -6,6 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
+from datetime import datetime
 
 _LOGGER = getLogger(__name__)
 
@@ -25,6 +26,7 @@ class OneRFIDSmartFeeder(Device):
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
+            get_work_record = await self.api.get_device_work_record(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
             # Update internal data with fetched API data
@@ -33,7 +35,8 @@ class OneRFIDSmartFeeder(Device):
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "workRecord": get_work_record if get_work_record is not None else []
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -199,6 +202,31 @@ class OneRFIDSmartFeeder(Device):
     @property
     def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
+    
+    @property
+    def last_feed_time(self) -> str | None:
+        """Return the recordTime of the last successful grain output as a formatted string."""
+        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
+        raw = self._data.get("workRecord", [])
+
+        # Log raw to help debug
+        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
+
+        if not raw or not isinstance(raw, list):
+            return None
+
+        for day_entry in raw:
+            work_records = day_entry.get("workRecords", [])
+            for record in work_records:
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    timestamp_ms = record.get("recordTime", 0)
+                    if timestamp_ms:
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
+                        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        return None
     
     @property
     def feeding_plan_today_data(self) -> str:

@@ -4,6 +4,7 @@ from typing import cast
 from logging import getLogger
 from ...exceptions import PetLibroAPIError
 from ..device import Device
+from datetime import datetime
 
 _LOGGER = getLogger(__name__)
 
@@ -170,6 +171,31 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         """Get the remaining desiccant days."""
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
+    @property
+    def last_feed_time(self) -> str | None:
+        """Return the recordTime of the last successful grain output as a formatted string."""
+        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
+        raw = self._data.get("workRecord", [])
+
+        # Log raw to help debug
+        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
+
+        if not raw or not isinstance(raw, list):
+            return None
+
+        for day_entry in raw:
+            work_records = day_entry.get("workRecords", [])
+            for record in work_records:
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    timestamp_ms = record.get("recordTime", 0)
+                    if timestamp_ms:
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
+                        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        return None
+
     @property
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
