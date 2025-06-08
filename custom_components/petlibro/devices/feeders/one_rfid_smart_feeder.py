@@ -6,6 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
+from datetime import datetime
 
 _LOGGER = getLogger(__name__)
 
@@ -204,7 +205,9 @@ class OneRFIDSmartFeeder(Device):
     
     @property
     def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output (timestamp in ms)."""
+        """Return the recordTime of the last successful grain output."""
+        _LOGGER.debug("Raw workRecord: %s", work_record)
+        _LOGGER.debug("Type of workRecord: %s", type(work_record))
         work_record = self._data.get("workRecord", {})
         _LOGGER.debug("Raw workRecord: %s", work_record)
         records_data = work_record.get("data", [])
