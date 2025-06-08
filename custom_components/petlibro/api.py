@@ -323,21 +323,23 @@ class PetLibroAPI:
         try:
             now = datetime.utcnow()
             thirty_days_ago = now - timedelta(days=30)
-            start_time = int(thirty_days_ago.timestamp() * 1000) # Convert to unix timestamps in ms.
+            start_time = int(thirty_days_ago.timestamp() * 1000)
             end_time = int(now.timestamp() * 1000)
             response = await self.session.request("POST", "/device/workRecord/list", json={
                 "deviceSn": device_id,
                 "startTime": start_time,
                 "endTime": end_time,
-                "size": 25, # just chose 25 to capture a good amount of results.
-                "type": ["GRAIN_OUTPUT_SUCCESS"] # We may need to capture different types for other feeders.
+                "size": 25,
+                "type": ["GRAIN_OUTPUT_SUCCESS"]
             })
 
-            # Store the time of the API call and the cached response
-            self._last_api_call_times[f"{device_id}_work_record"] = now
-            self._cached_responses[f"{device_id}_work_record"] = response
+            json_data = await response.json()
 
-            return response
+            # Store the time of the API call and the parsed JSON response
+            self._last_api_call_times[f"{device_id}_work_record"] = now
+            self._cached_responses[f"{device_id}_work_record"] = json_data
+
+            return json_data
         except Exception as e:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
