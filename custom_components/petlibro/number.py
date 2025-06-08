@@ -210,32 +210,6 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: device.set_water_dispensing_duration(value),
             name="Water Dispensing Duration"
         ),
-        PetLibroNumberEntityDescription[DockstreamSmartFountain](
-            key="cleaning_frequency",
-            translation_key="cleaning_frequency",
-            icon="mdi:calendar-alert",
-            native_unit_of_measurement="Days",
-            mode="box",
-            native_max_value=60,
-            native_min_value=1,
-            native_step=1,
-            value=lambda device: device.cleaning_frequency,
-            method=lambda device, value: device.set_cleaning_frequency(value),
-            name="Machine Cleaning Frequency"
-        ),
-        PetLibroNumberEntityDescription[DockstreamSmartFountain](
-            key="filter_frequency",
-            translation_key="filter_frequency",
-            icon="mdi:calendar-alert",
-            native_unit_of_measurement="Days",
-            mode="box",
-            native_max_value=60,
-            native_min_value=1,
-            native_step=1,
-            value=lambda device: device.filter_frequency,
-            method=lambda device, value: device.set_filter_frequency(value),
-            name="Filter Frequency"
-        ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
@@ -261,32 +235,6 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             value=lambda device: device.water_dispensing_duration,
             method=lambda device, value: device.set_water_dispensing_duration(value),
             name="Water Dispensing Duration"
-        ),
-        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
-            key="cleaning_frequency",
-            translation_key="cleaning_frequency",
-            icon="mdi:calendar-alert",
-            native_unit_of_measurement="Days",
-            mode="box",
-            native_max_value=60,
-            native_min_value=1,
-            native_step=1,
-            value=lambda device: device.cleaning_frequency,
-            method=lambda device, value: device.set_cleaning_frequency(value),
-            name="Machine Cleaning Frequency"
-        ),
-        PetLibroNumberEntityDescription[DockstreamSmartRFIDFountain](
-            key="filter_frequency",
-            translation_key="filter_frequency",
-            icon="mdi:calendar-alert",
-            native_unit_of_measurement="Days",
-            mode="box",
-            native_max_value=60,
-            native_min_value=1,
-            native_step=1,
-            value=lambda device: device.filter_frequency,
-            method=lambda device, value: device.set_filter_frequency(value),
-            name="Filter Frequency"
         ),
     ],
 }
