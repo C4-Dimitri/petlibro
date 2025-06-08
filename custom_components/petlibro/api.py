@@ -257,7 +257,7 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
 
     async def get_device_attribute_settings(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
@@ -308,6 +308,39 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
+
+    async def get_device_work_record(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_work_record")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping workRecord request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_work_record", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            now = datetime.utcnow()
+            thirty_days_ago = now - timedelta(days=30)
+            start_time = int(thirty_days_ago.timestamp() * 1000) # Convert to unix timestamps in ms.
+            end_time = int(now.timestamp() * 1000)
+            response = await self.session.request("POST", "/device/workRecord/list", json={
+                "deviceSn": device_id,
+                "startTime": start_time,
+                "endTime": end_time,
+                "size": 25, # just chose 25 to capture a good amount of results.
+                "type": ["GRAIN_OUTPUT_SUCCESS"] # We may need to capture different types for other feeders.
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_work_record"] = now
+            self._cached_responses[f"{device_id}_work_record"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
 
     async def get_default_matrix(self, device_sn: str) -> dict:
         """

@@ -25,6 +25,7 @@ class OneRFIDSmartFeeder(Device):
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
+            get_work_record = await self.api.get_device_work_record(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
             # Update internal data with fetched API data
@@ -33,7 +34,8 @@ class OneRFIDSmartFeeder(Device):
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "workRecord": get_work_record or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for OneRFIDSmartFeeder: {err}")
@@ -200,6 +202,25 @@ class OneRFIDSmartFeeder(Device):
     def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
+    @property
+    def last_feed_time(self) -> str | None:
+        """Return the recordTime of the last successful grain output (timestamp in ms)."""
+        work_record = self._data.get("workRecord", {})
+        records_data = work_record.get("data", [])
+
+        if not records_data:
+            return None
+
+        work_records = records_data[0].get("workRecords", [])
+        for record in work_records:
+            if record.get("type") == "GRAIN_OUTPUT_SUCCESS": # May need different type for different feeders.
+                timestamp_ms = record.get("recordTime", 0)
+                if timestamp_ms:
+                    dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                    return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        return None
+
     @property
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
