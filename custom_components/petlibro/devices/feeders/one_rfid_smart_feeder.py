@@ -206,6 +206,7 @@ class OneRFIDSmartFeeder(Device):
     def last_feed_time(self) -> str | None:
         """Return the recordTime of the last successful grain output (timestamp in ms)."""
         work_record = self._data.get("workRecord", {})
+        _LOGGER.debug("Raw workRecord: %s", work_record)
         records_data = work_record.get("data", [])
 
         if not records_data:
