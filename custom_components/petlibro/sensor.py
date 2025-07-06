@@ -299,6 +299,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Today Feeding Times"
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="last_feed_time",
+            translation_key="last_feed_time",
+            icon="mdi:history",
+            name="Last Feed Time"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
@@ -374,6 +380,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Feeding Times"
+        ),
+        PetLibroSensorEntityDescription[GranarySmartFeeder](
+            key="last_feed_time",
+            translation_key="last_feed_time",
+            icon="mdi:history",
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="child_lock_switch",
@@ -452,6 +464,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Feeding Times"
+        ),
+        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
+            key="last_feed_time",
+            translation_key="last_feed_time",
+            icon="mdi:history",
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="child_lock_switch",
@@ -575,10 +593,14 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="today_eating_time",
             translation_key="today_eating_time",
-            native_unit_of_measurement="s",
             icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Today Eating Time"
+            name="Last Feed Time"
+        ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="last_feed_time",
+            translation_key="last_feed_time",
+            icon="mdi:history",
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="display_selection",
@@ -733,6 +755,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today Feeding Times"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="last_feed_time",
+            translation_key="last_feed_time",
+            icon="mdi:history",
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
             key="pump_air_state",

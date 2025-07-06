@@ -257,7 +257,7 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
 
     async def get_device_attribute_settings(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
@@ -308,6 +308,43 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
+
+    async def get_device_work_record(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_work_record")
+
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping workRecord request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_work_record", {})
+
+        try:
+            thirty_days_ago = now - timedelta(days=30)
+            start_time = int(thirty_days_ago.timestamp() * 1000)
+            end_time = int(now.timestamp() * 1000)
+
+            # Make the actual POST request
+            response_data = await self.session.request("POST", "/device/workRecord/list", json={
+                "deviceSn": device_id,
+                "startTime": start_time,
+                "endTime": end_time,
+                "size": 25,
+                "type": ["GRAIN_OUTPUT_SUCCESS"]
+            })
+
+            # Log and inspect what actually came back
+            _LOGGER.debug("Raw response_data from workRecord: %s", response_data)
+            _LOGGER.debug("Type of response_data: %s", type(response_data))
+
+            # Just save whatever we got — don't attempt .json()
+            self._last_api_call_times[f"{device_id}_work_record"] = now
+            self._cached_responses[f"{device_id}_work_record"] = response_data
+
+            return response_data
+
+        except Exception as e:
+            _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
 
     async def get_default_matrix(self, device_sn: str) -> dict:
         """
