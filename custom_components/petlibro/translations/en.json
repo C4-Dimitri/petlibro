@@ -60,6 +60,9 @@
             "today_eating_time": {
                 "name": "Today's Total Eating Time"
             },
+            "last_feed_time": {
+                "name": "Last Feed Time"
+            },
             "feeding_plan_state": {
                 "name": "Today's Feeding Plan"
             },
