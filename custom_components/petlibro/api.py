@@ -546,6 +546,38 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
             raise
 
+    async def set_vacuum_mode(self, serial: str, value: str):
+        """Set the vacuum mode."""
+        _LOGGER.debug(f"Setting vacuum mode: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/vacuum", json={
+                "deviceSn": serial,
+                "vacuumMode": value,
+                "requestId": request_id
+            })
+
+            # Check if response is already parsed (since response is an integer here)
+            if isinstance(response, int):
+                _LOGGER.debug(f"Vacuum mode successful, returned code: {response}")
+                return response
+            
+            # If response is a dictionary (JSON), handle it
+            response_data = await response.json()
+            _LOGGER.debug(f"Vacuum mode response data: {response_data}")
+            
+            # Check if the response indicates success
+            if response.status != 200 or response_data.get("code") != 0:
+                raise PetLibroAPIError(f"Failed to trigger vacuum mode: {response_data.get('msg')}")
+
+            return response_data
+
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger vacuum mode for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering vacuum mode: {err}")
+
     async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
         """Set the water interval."""
         _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")

@@ -777,6 +777,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:air-filter",
             name="Pump Air State"
         ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="vacuum_mode",
+            translation_key="vacuum_mode",
+            icon="mdi:air-filter",
+            name="Vacuum Mode"
+        ),
     ],
     DockstreamSmartFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartFountain](

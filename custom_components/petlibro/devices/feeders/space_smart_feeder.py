@@ -299,3 +299,26 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
+    @property
+    def vacuum_mode(self) -> str:
+        api_value =  self._data.get("realInfo", {}).get("vacuumMode", "NORMAL")
+
+        # Direct mapping inside the property
+        if api_value == "LEARNING":
+            return "Study"
+        elif api_value == "NORMAL":
+            return "Normal"
+        elif api_value == "MANUAL":
+            return "Manual"
+        else:
+            return "Unknown"
+
+    async def set_vacuum_mode(self, value: str) -> None:
+        _LOGGER.debug(f"Setting vacuum mode to {value} for {self.serial}")
+        try:
+            await self.api.set_vacuum_mode(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set vacuum mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting vacuum mode: {err}")

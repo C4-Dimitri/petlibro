@@ -122,6 +122,9 @@
             },
             "display_selection": {
                 "name": "Display Value"
+            },
+            "vacuum_mode": {
+                "name": "Vacuum Mode"
             }
         },
         "switch": {
