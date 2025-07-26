@@ -257,7 +257,7 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
     async def get_device_attribute_settings(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
@@ -308,43 +308,6 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching baseInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching baseInfo for device {device_id}: {e}")
-
-    async def get_device_work_record(self, device_id: str) -> dict:
-        """Fetch real-time information for a device, with caching to prevent frequent requests."""
-        now = datetime.utcnow()
-        last_call_time = self._last_api_call_times.get(f"{device_id}_work_record")
-
-        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
-            _LOGGER.debug(f"Skipping workRecord request for {device_id}, using cached response.")
-            return self._cached_responses.get(f"{device_id}_work_record", {})
-
-        try:
-            thirty_days_ago = now - timedelta(days=30)
-            start_time = int(thirty_days_ago.timestamp() * 1000)
-            end_time = int(now.timestamp() * 1000)
-
-            # Make the actual POST request
-            response_data = await self.session.request("POST", "/device/workRecord/list", json={
-                "deviceSn": device_id,
-                "startTime": start_time,
-                "endTime": end_time,
-                "size": 25,
-                "type": ["GRAIN_OUTPUT_SUCCESS"]
-            })
-
-            # Log and inspect what actually came back
-            _LOGGER.debug("Raw response_data from workRecord: %s", response_data)
-            _LOGGER.debug("Type of response_data: %s", type(response_data))
-
-            # Just save whatever we got — don't attempt .json()
-            self._last_api_call_times[f"{device_id}_work_record"] = now
-            self._cached_responses[f"{device_id}_work_record"] = response_data
-
-            return response_data
-
-        except Exception as e:
-            _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
-            raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
 
     async def get_default_matrix(self, device_sn: str) -> dict:
         """
@@ -471,9 +434,9 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
-    async def set_desiccant_frequency(self, serial: str, value: float, key = str) -> JSON:
-        """Set the desiccant frequency."""
-        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}, key={key}")
+    async def set_desiccant_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the desiccant cycle."""
+        _LOGGER.debug(f"Setting desiccant cycle: serial={serial}, value={value}, key={key}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
@@ -486,10 +449,10 @@ class PetLibroAPI:
                     "timeout": 5000
                 },
             )
-            _LOGGER.debug(f"Desiccant frequency set successfully: {response}")
+            _LOGGER.debug(f"Desiccant cycle set successfully: {response}")
             return response
         except Exception as e:
-            _LOGGER.error(f"Failed to set desiccant frequency for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set desiccant cycle for device {serial}: {e}")
             raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
@@ -584,9 +547,9 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
-    async def set_cleaning_frequency(self, serial: str, value: float, key = str) -> JSON:
-        """Set the machine cleaning frequency."""
-        _LOGGER.debug(f"Setting machine cleaning frequency: serial={serial}, value={value}, key={key}")
+    async def set_cleaning_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the machine cleaning cycle."""
+        _LOGGER.debug(f"Setting machine cleaning cycle: serial={serial}, value={value}, key={key}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
@@ -599,15 +562,15 @@ class PetLibroAPI:
                     "timeout": 5000
                 },
             )
-            _LOGGER.debug(f"Machine cleaning frequency set successfully: {response}")
+            _LOGGER.debug(f"Machine cleaning cycle set successfully: {response}")
             return response
         except Exception as e:
-            _LOGGER.error(f"Failed to set machine cleaning frequency for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set machine cleaning cycle for device {serial}: {e}")
             raise
 
-    async def set_filter_frequency(self, serial: str, value: float, key = str) -> JSON:
-        """Set the filter frequency."""
-        _LOGGER.debug(f"Setting filter frequency: serial={serial}, value={value}, key={key}")
+    async def set_filter_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the filter cycle."""
+        _LOGGER.debug(f"Setting filter cycle: serial={serial}, value={value}, key={key}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
@@ -620,10 +583,10 @@ class PetLibroAPI:
                     "timeout": 5000
                 },
             )
-            _LOGGER.debug(f"Filter frequency set successfully: {response}")
+            _LOGGER.debug(f"Filter cycle set successfully: {response}")
             return response
         except Exception as e:
-            _LOGGER.error(f"Failed to set filter frequency for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set filter cycle for device {serial}: {e}")
             raise
 
     async def set_lid_mode(self, serial: str, value: str):
@@ -796,10 +759,10 @@ class PetLibroAPI:
         _LOGGER.debug(f"Triggering desiccant reset for device with serial: {serial}")
         
         try:
-            # Generate a dynamic request ID for the dessicant reset
+            # Generate a dynamic request ID for the desiccant reset
             request_id = str(uuid.uuid4()).replace("-", "")
 
-            # Send the POST request to trigger dessicant reset
+            # Send the POST request to trigger desiccant reset
             response = await self.session.post("/device/device/desiccantReset", json={
                 "deviceSn": serial,
                 "requestId": request_id,  # Use dynamic request ID
