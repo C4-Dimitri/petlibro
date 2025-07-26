@@ -195,9 +195,9 @@ class OneRFIDSmartFeeder(Device):
         return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+        return cast(float, self._data.get("remainingDesiccantDays", 0))
     
     @property
     def desiccant_frequency(self) -> float:

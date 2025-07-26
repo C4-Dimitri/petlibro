@@ -341,6 +341,10 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            native_value="float",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
@@ -424,7 +428,10 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
-            native_unit_of_measurement="days",
+            native_unit_of_measurement="d",
+            native_value="float",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
@@ -543,6 +550,10 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            native_value="float",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
