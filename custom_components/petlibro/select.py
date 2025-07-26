@@ -103,6 +103,11 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
+            },
+            "vacuum_mode": {
+                "Study": "LEARNING",
+                "Normal": "NORMAL",
+                "Manual": "MANUAL"
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
