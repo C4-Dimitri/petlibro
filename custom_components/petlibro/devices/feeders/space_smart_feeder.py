@@ -299,4 +299,3 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
-
