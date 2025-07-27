@@ -57,6 +57,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_installed_version = "0.0.0"
         self._attr_latest_version = "0.0.0"
         self._attr_release_summary = "No firmware information available"
+        self._attr_release_notes = "No detailed changelog available."
         self._attr_release_url = "https://petlibro.com/pages/help-center"
         self._attr_display_precision = 0
         self._attr_in_progress = False
