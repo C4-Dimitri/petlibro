@@ -57,7 +57,6 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_installed_version = "0.0.0"
         self._attr_latest_version = "0.0.0"
         self._attr_release_summary = "No firmware information available"
-        self._attr_release_notes = "No detailed changelog available."
         self._attr_release_url = "https://petlibro.com/pages/help-center"
         self._attr_display_precision = 0
         self._attr_in_progress = False
@@ -78,16 +77,16 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def release_summary(self) -> str:
-        summary = self.device.update_release_notes or self._attr_release_summary
-        _LOGGER.debug("[UpdateEntity] release_summary returning: %s", summary)
-        return summary
+        # If no update available (up to date), return an empty string
+        if self.installed_version == self.latest_version:
+            _LOGGER.debug("release_summary returning empty (up-to-date)")
+            return ""
 
-    @property
-    def release_notes(self) -> str | None:
-        """Return full release notes (changelog)."""
-        notes = self.device.update_release_notes
-        _LOGGER.debug("[UpdateEntity] release_notes returning: %s", notes)
-        return notes or "No detailed changelog available."
+        # Otherwise return the provided update notes
+        summary = self.device.update_release_notes
+        value = summary if summary else "Firmware update available."
+        _LOGGER.debug("release_summary returning: %s", value)
+        return value
 
     @property
     def release_url(self) -> str:
