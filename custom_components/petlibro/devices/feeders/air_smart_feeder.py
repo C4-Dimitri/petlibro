@@ -95,7 +95,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
