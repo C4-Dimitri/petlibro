@@ -103,7 +103,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         _LOGGER.debug("Triggering firmware update for %s", self.device.name)
         await self.device.api.trigger_firmware_upgrade(self.device.serial, job_item_id)
 
-DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
+DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
     Feeder: [
     ],
     AirSmartFeeder: [
@@ -192,7 +192,7 @@ async def async_setup_entry(
     entities = [
         PetLibroUpdateEntity(device, hub, description)
         for device in devices  # Iterate through devices from the hub
-        for device_type, entity_descriptions in DEVICE_SENSOR_MAP.items()
+        for device_type, entity_descriptions in DEVICE_UPDATE_MAP.items()
         if isinstance(device, device_type)
         for description in entity_descriptions
     ]
