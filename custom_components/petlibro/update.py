@@ -84,6 +84,19 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         return value
 
     @property
+    def title(self) -> str:
+        """Return title of the firmware/software."""
+        value = f"{self.device.name} Firmware"
+        _LOGGER.debug("title returning: %s", value)
+        return value
+
+    @property
+    def display_precision(self) -> int:
+        value = 0
+        _LOGGER.debug("display_precision returning: %s", value)
+        return value
+
+    @property
     def in_progress(self) -> bool:
         progress = self.device.update_progress
         in_progress = progress is not None and 0.0 < progress < 100.0
