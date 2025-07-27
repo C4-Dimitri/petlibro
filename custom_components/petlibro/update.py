@@ -53,6 +53,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
         self._attr_supported_features = (
             UpdateEntityFeature.INSTALL
+            | UpdateEntityFeature.PROGRESS
             | UpdateEntityFeature.RELEASE_NOTES
         )
         self._attr_title = f"{device.name} Firmware"
@@ -76,11 +77,11 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         return summary
 
     @property
-    def release_url(self) -> str | None:
-        upgrade_data = self.device._data.get("getUpgrade")
-        url = upgrade_data.get("upgradeUrl") if upgrade_data else None
-        _LOGGER.debug("release_url returning: %s", url)
-        return url
+    def release_url(self) -> str:
+        url = self.device._data.get("getUpgrade", {}).get("upgradeUrl")
+        value = url if url else ""
+        _LOGGER.debug("release_url returning: %s", value)
+        return value
 
     @property
     def in_progress(self) -> bool:
