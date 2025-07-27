@@ -59,10 +59,13 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_title = f"{device.name} Firmware"
 
     @property
-    def installed_version(self) -> str:
-        version = getattr(self.device, "software_version", "unknown") or "unknown"
-        _LOGGER.debug("installed_version returning: %s", version)
-        return version
+    def latest_version(self) -> str | None:
+        """Return the latest firmware version available, or fallback to installed."""
+        version = self.device.update_version
+        if version:
+            return version
+        # Fallback: just use installed version so HA doesn't think it's unknown
+        return self.installed_version
 
     @property
     def latest_version(self) -> str:
@@ -72,16 +75,13 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def release_summary(self) -> str:
-        summary = self.device.update_release_notes or "No release notes available"
-        _LOGGER.debug("release_summary returning: %s", summary)
-        return summary
+        summary = self.device.update_release_notes
+        return summary if summary else "Device firmware is up to date."
 
     @property
     def release_url(self) -> str:
-        url = self.device._data.get("getUpgrade", {}).get("upgradeUrl")
-        value = url if url else ""
-        _LOGGER.debug("release_url returning: %s", value)
-        return value
+        url = self.device._data.get("getUpgrade", {}).get("upgradeUrl", "")
+        return url or ""
 
     @property
     def title(self) -> str:
@@ -112,9 +112,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def available(self) -> bool:
-        available = self.device.update_available
-        _LOGGER.debug("available returning: %s", available)
-        return available
+        return True
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
         _LOGGER.debug("Install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
