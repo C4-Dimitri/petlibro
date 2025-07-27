@@ -58,9 +58,15 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         )
         self._attr_title = f"{device.name} Firmware"
 
-        # Default safe values so HA won't mark it Unknown on startup
+        # **Default values to avoid None**
         self._attr_installed_version = "0.0.0"
         self._attr_latest_version = "0.0.0"
+        self._attr_release_summary = "Device firmware status unknown"
+        self._attr_release_url = ""
+        self._attr_display_precision = 0
+        self._attr_in_progress = False
+        self._attr_update_percentage = None
+        self._attr_available = True
 
     @property
     def installed_version(self) -> str:
