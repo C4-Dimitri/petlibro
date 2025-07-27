@@ -917,6 +917,12 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             native_unit_of_measurement="days",
             name="Remaining Filter Days"
         ),
+        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
+            key="update_version",
+            translation_key="update_version",
+            icon="mdi:package",
+            name="Update Version"
+        ),
     ]
 }
 
