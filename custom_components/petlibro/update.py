@@ -49,7 +49,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
         self._attr_supported_features = (
-            UpdateEntityFeature.INSTALL
+            UpdateEntityFeature.INSTALL | UpdateEntityFeature.RELEASE_NOTES
         )
         self._attr_title = f"{device.name} Firmware"
 
@@ -123,6 +123,10 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     def available(self) -> bool:
         _LOGGER.debug("[UpdateEntity] available returning: True")
         return True
+
+    async def async_release_notes(self) -> str | None:
+        # Return detailed notes or just reuse summary
+        return self.device.update_release_notes or "No detailed release notes provided."
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
         _LOGGER.debug("Install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
