@@ -38,10 +38,7 @@ class PetLibroUpdateEntityDescription(UpdateEntityDescription, PetLibroEntityDes
 class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     """PETLIBRO update entity."""
 
-    entity_description: PetLibroUpdateEntityDescription[_DeviceT]
-
     def __init__(self, device, hub, description):
-        """Initialize the update entity."""
         super().__init__(device, hub, description)
 
         mac_address = getattr(device, "mac", None)
@@ -52,17 +49,15 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
         self._attr_supported_features = (
-            UpdateEntityFeature.INSTALL
-            | UpdateEntityFeature.PROGRESS
-            | UpdateEntityFeature.RELEASE_NOTES
+            UpdateEntityFeature.INSTALL | UpdateEntityFeature.RELEASE_NOTES
         )
         self._attr_title = f"{device.name} Firmware"
 
-        # **Default values to avoid None**
+        # Default safe values
         self._attr_installed_version = "0.0.0"
         self._attr_latest_version = "0.0.0"
-        self._attr_release_summary = "Device firmware status unknown"
-        self._attr_release_url = ""
+        self._attr_release_summary = "No firmware information available"
+        self._attr_release_url = "https://petlibro.com/pages/help-center"
         self._attr_display_precision = 0
         self._attr_in_progress = False
         self._attr_update_percentage = None
@@ -70,64 +65,57 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def installed_version(self) -> str:
-        version = getattr(self.device, "software_version", None)
-        value = version if version else self._attr_installed_version
-        _LOGGER.debug("installed_version returning: %s", value)
-        return value
+        version = getattr(self.device, "software_version", None) or self._attr_installed_version
+        _LOGGER.debug("[UpdateEntity] installed_version returning: %s", version)
+        return version
 
     @property
     def latest_version(self) -> str:
         version = self.device.update_version or self.installed_version
-        value = version if version else self._attr_latest_version
-        _LOGGER.debug("latest_version returning: %s", value)
-        return value
+        _LOGGER.debug("[UpdateEntity] latest_version returning: %s", version)
+        return version
 
     @property
     def release_summary(self) -> str:
-        summary = self.device.update_release_notes
-        value = summary if summary else self._attr_release_summary
-        _LOGGER.debug("release_summary returning: %s", value)
-        return value
+        summary = self.device.update_release_notes or self._attr_release_summary
+        _LOGGER.debug("[UpdateEntity] release_summary returning: %s", summary)
+        return summary
 
     @property
     def release_url(self) -> str:
-        """Return firmware release notes URL (static placeholder instead of binary)."""
-        value = "https://petlibro.com/pages/help-center"
-        _LOGGER.debug("release_url returning: %s", value)
-        return value
+        url = self._attr_release_url
+        _LOGGER.debug("[UpdateEntity] release_url returning: %s", url)
+        return url
 
     @property
     def title(self) -> str:
-        value = f"{self.device.name} Firmware" if self.device.name else self._attr_title
-        _LOGGER.debug("title returning: %s", value)
-        return value
+        title = self._attr_title
+        _LOGGER.debug("[UpdateEntity] title returning: %s", title)
+        return title
 
     @property
     def display_precision(self) -> int:
-        value = self._attr_display_precision
-        _LOGGER.debug("display_precision returning: %s", value)
-        return value
+        _LOGGER.debug("[UpdateEntity] display_precision returning: %s", self._attr_display_precision)
+        return self._attr_display_precision
 
     @property
     def in_progress(self) -> bool:
         progress = self.device.update_progress
         in_progress = progress is not None and 0.0 < progress < 100.0
-        value = in_progress if in_progress is not None else self._attr_in_progress
-        _LOGGER.debug("in_progress returning: %s (progress=%s)", value, progress)
-        return value
+        _LOGGER.debug("[UpdateEntity] in_progress returning: %s (progress=%s)", in_progress, progress)
+        return in_progress
 
     @property
     def update_percentage(self) -> float | None:
         progress = self.device.update_progress
-        value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else self._attr_update_percentage
-        _LOGGER.debug("update_percentage returning: %s (raw progress=%s)", value, progress)
+        value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else None
+        _LOGGER.debug("[UpdateEntity] update_percentage returning: %s (raw progress=%s)", value, progress)
         return value
 
     @property
     def available(self) -> bool:
-        value = True
-        _LOGGER.debug("available returning: %s", value)
-        return value
+        _LOGGER.debug("[UpdateEntity] available returning: True")
+        return True
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
         _LOGGER.debug("Install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
