@@ -82,6 +82,13 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         return summary
 
     @property
+    def release_notes(self) -> str | None:
+        """Return full release notes (changelog)."""
+        notes = self.device.update_release_notes
+        _LOGGER.debug("[UpdateEntity] release_notes returning: %s", notes)
+        return notes or "No detailed changelog available."
+
+    @property
     def release_url(self) -> str:
         url = self._attr_release_url
         _LOGGER.debug("[UpdateEntity] release_url returning: %s", url)
