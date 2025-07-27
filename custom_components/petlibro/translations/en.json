@@ -122,9 +122,6 @@
             },
             "display_selection": {
                 "name": "Display Value"
-            },
-            "update_version": {
-                "name": "Update Version"
             }
         },
         "switch": {

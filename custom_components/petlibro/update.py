@@ -71,29 +71,39 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     @property
     def release_summary(self) -> str | None:
         """Return release notes (if any)."""
+        upgrade_data = self.device._data.get("getUpgrade")
+        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         return self.device.update_release_notes
 
     @property
     def release_url(self) -> str | None:
         """Return firmware download URL."""
         upgrade_data = self.device._data.get("getUpgrade")
+        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         return upgrade_data.get("upgradeUrl") if upgrade_data else None
 
     @property
     def in_progress(self) -> bool:
         """Return if an update is currently in progress."""
+        upgrade_data = self.device._data.get("getUpgrade")
+        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         return 0.0 < self.device.update_progress < 100.0    
 
     @property
     def update_percentage(self) -> float | None:
         """Return update installation progress as 0-100% or None."""
+        upgrade_data = self.device._data.get("getUpgrade")
+        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         progress = self.device.update_progress
+        _LOGGER.debug("release_url raw data: %s", progress)
         # Always return 0 if progress is 0 instead of None
         return round(progress, 1)
 
     @property
     def available(self) -> bool:
         """Return True if updates are available."""
+        upgrade_data = self.device._data.get("getUpgrade")
+        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         return self.device.update_available
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
