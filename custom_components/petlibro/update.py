@@ -53,7 +53,6 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
         self._attr_supported_features = (
             UpdateEntityFeature.INSTALL
-            | UpdateEntityFeature.PROGRESS
             | UpdateEntityFeature.RELEASE_NOTES
         )
         self._attr_title = f"{device.name} Firmware"
@@ -91,7 +90,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         return in_progress
 
     @property
-    def update_percentage(self) -> int | float | None:
+    def update_percentage(self) -> float | None:
         progress = self.device.update_progress
         value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else None
         _LOGGER.debug("update_percentage returning: %s (raw progress=%s)", value, progress)
@@ -104,7 +103,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         return available
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
-        _LOGGER.debug("async_install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
+        _LOGGER.debug("Install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
 
         upgrade_data = self.device._data.get("getUpgrade", {})
         job_item_id = upgrade_data.get("jobItemId")
