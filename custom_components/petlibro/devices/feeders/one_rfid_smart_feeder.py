@@ -247,6 +247,8 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+    
+    @property
     def sound_switch(self) -> bool:
         return self._data.get("realInfo", {}).get("soundSwitch", False)
 

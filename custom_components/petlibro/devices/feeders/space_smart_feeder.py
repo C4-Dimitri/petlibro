@@ -172,6 +172,10 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return cast(float, self._data.get("remainingDesiccantDays", 0))
 
     @property
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
     def last_feed_time(self) -> str | None:
         """Return the recordTime of the last successful grain output as a formatted string."""
         _LOGGER.debug("last_feed_time called for device: %s", self.serial)

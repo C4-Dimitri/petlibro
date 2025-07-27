@@ -377,6 +377,13 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
         ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="sound_switch",
+            translation_key="sound_switch",
+            icon="mdi:volume-high",
+            should_report=lambda device: device.sound_switch is not None,
+            name="Sound Status"
+        ),
     ],
     DockstreamSmartFountain: [
         PetLibroBinarySensorEntityDescription[DockstreamSmartFountain](
