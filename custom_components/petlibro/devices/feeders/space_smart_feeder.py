@@ -170,7 +170,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     def remaining_desiccant(self) -> float:
         """Get the remaining desiccant days."""
         return cast(float, self._data.get("remainingDesiccantDays", 0))
-    
+
     @property
     def last_feed_time(self) -> str | None:
         """Return the recordTime of the last successful grain output as a formatted string."""
@@ -322,3 +322,36 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set vacuum mode for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting vacuum mode: {err}")
+
+    # Method for sound turn on
+    async def set_sound_on(self) -> None:
+        _LOGGER.debug(f"Turning on the sound for {self.serial}")
+        try:
+            await self.api.set_sound_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the sound: {err}")
+
+    # Method for sound turn off
+    async def set_sound_off(self) -> None:
+        _LOGGER.debug(f"Turning off the sound for {self.serial}")
+        try:
+            await self.api.set_sound_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the sound: {err}")
+
+    @property
+    def sound_level(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_sound_level(self, value: float) -> None:
+        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
+        try:
+            await self.api.set_sound_level(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound level: {err}")

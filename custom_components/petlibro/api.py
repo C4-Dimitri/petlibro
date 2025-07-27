@@ -515,7 +515,7 @@ class PetLibroAPI:
 
     async def set_lid_close_time(self, serial: str, value: float):
         """Set the lid close time."""
-        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        _LOGGER.debug(f"Setting lid close time: serial={serial}, value={value}")
         try:
             response = await self.session.post("/device/setting/updateCoverSetting", json={
                 "deviceSn": serial,
