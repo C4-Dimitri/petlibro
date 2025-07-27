@@ -251,7 +251,7 @@
             }
         },
         "update": {
-            "update": {
+            "firmware": {
                 "name": "Update"
             }
         }
