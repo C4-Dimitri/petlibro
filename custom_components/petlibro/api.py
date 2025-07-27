@@ -871,6 +871,24 @@ class PetLibroAPI:
             "lightingEndTime": None
         })
 
+    async def set_light_on(self, serial: str):
+        """Trigger turn sleep mode on"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": True,
+            "sleepEndTime": None,
+            "sleepStartTime": None
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn sleep mode off"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": False,
+            "sleepEndTime": None,
+            "sleepStartTime": None
+        })
+
     async def set_reposition_schedule(self, serial: str, plan: dict, template_name: str):
         """Reposition the schedule"""
         _LOGGER.debug(f"Triggering reposition schedule for device with serial: {serial}")

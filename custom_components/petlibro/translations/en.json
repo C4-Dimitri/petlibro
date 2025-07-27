@@ -175,6 +175,12 @@
             "light_off": {
                 "name": "Turn Off Light"
             },
+            "sleep_on": {
+                "name": "Turn On Sleep Mode"
+            },
+            "sleep_off": {
+                "name": "Turn Off Sleep Mode"
+            },
             "desiccant_reset": {
                 "name": "Desiccant Replaced"
             },

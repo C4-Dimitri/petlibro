@@ -381,3 +381,23 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to turn off the light for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error turning off the light: {err}")
+
+    # Method for light turn on
+    async def set_sleep_on(self) -> None:
+        _LOGGER.debug(f"Turning on sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on sleep mode: {err}")
+
+    # Method for light turn off
+    async def set_sleep_off(self) -> None:
+        _LOGGER.debug(f"Turning off sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off sleep mode: {err}")
