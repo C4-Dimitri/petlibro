@@ -85,19 +85,16 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     @property
     def in_progress(self) -> bool:
         """Return if an update is currently in progress."""
-        upgrade_data = self.device._data.get("getUpgrade")
-        _LOGGER.debug("release_url raw data: %s", upgrade_data)
-        return 0.0 < self.device.update_progress < 100.0    
+        progress = self.device.update_progress
+        return bool(progress is not None and 0.0 < progress < 100.0)
 
     @property
     def update_percentage(self) -> float | None:
         """Return update installation progress as 0-100% or None."""
-        upgrade_data = self.device._data.get("getUpgrade")
-        _LOGGER.debug("release_url raw data: %s", upgrade_data)
         progress = self.device.update_progress
-        _LOGGER.debug("release_url raw data: %s", progress)
-        # Always return 0 if progress is 0 instead of None
-        return round(progress, 1)
+        if progress is None:
+            return None
+        return float(progress)
 
     @property
     def available(self) -> bool:
