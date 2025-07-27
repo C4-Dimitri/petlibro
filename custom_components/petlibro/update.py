@@ -91,8 +91,8 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def release_url(self) -> str:
-        url = self.device._data.get("getUpgrade", {}).get("upgradeUrl", "")
-        value = url if url else self._attr_release_url
+        """Return firmware release notes URL (static placeholder instead of binary)."""
+        value = "https://petlibro.com/pages/help-center"
         _LOGGER.debug("release_url returning: %s", value)
         return value
 
