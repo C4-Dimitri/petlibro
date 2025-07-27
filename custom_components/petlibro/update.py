@@ -59,54 +59,52 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_title = f"{device.name} Firmware"
 
     @property
-    def installed_version(self) -> str | None:
-        """Return the currently installed firmware version."""
-        return getattr(self.device, "software_version", None)
+    def installed_version(self) -> str:
+        version = getattr(self.device, "software_version", "unknown") or "unknown"
+        _LOGGER.debug("installed_version returning: %s", version)
+        return version
 
     @property
-    def latest_version(self) -> str | None:
-        """Return the latest firmware version available."""
-        return self.device.update_version
+    def latest_version(self) -> str:
+        version = self.device.update_version or self.installed_version
+        _LOGGER.debug("latest_version returning: %s", version)
+        return version
 
     @property
-    def release_summary(self) -> str | None:
-        """Return release notes (if any)."""
-        upgrade_data = self.device._data.get("getUpgrade")
-        _LOGGER.debug("release_url raw data: %s", upgrade_data)
-        return self.device.update_release_notes
+    def release_summary(self) -> str:
+        summary = self.device.update_release_notes or "No release notes available"
+        _LOGGER.debug("release_summary returning: %s", summary)
+        return summary
 
     @property
     def release_url(self) -> str | None:
-        """Return firmware download URL."""
         upgrade_data = self.device._data.get("getUpgrade")
-        _LOGGER.debug("release_url raw data: %s", upgrade_data)
-        return upgrade_data.get("upgradeUrl") if upgrade_data else None
+        url = upgrade_data.get("upgradeUrl") if upgrade_data else None
+        _LOGGER.debug("release_url returning: %s", url)
+        return url
 
     @property
     def in_progress(self) -> bool:
-        """Return if an update is currently in progress."""
         progress = self.device.update_progress
-        return bool(progress is not None and 0.0 < progress < 100.0)
+        in_progress = progress is not None and 0.0 < progress < 100.0
+        _LOGGER.debug("in_progress returning: %s (progress=%s)", in_progress, progress)
+        return in_progress
 
     @property
-    def update_percentage(self) -> float | None:
-        """Return update installation progress as 0-100% or None."""
+    def update_percentage(self) -> int | float | None:
         progress = self.device.update_progress
-        if progress is None:
-            return None
-        return float(progress)
+        value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else None
+        _LOGGER.debug("update_percentage returning: %s (raw progress=%s)", value, progress)
+        return value
 
     @property
     def available(self) -> bool:
-        """Return True if updates are available."""
-        upgrade_data = self.device._data.get("getUpgrade")
-        _LOGGER.debug("release_url raw data: %s", upgrade_data)
-        return self.device.update_available
+        available = self.device.update_available
+        _LOGGER.debug("available returning: %s", available)
+        return available
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
-        """Trigger firmware update on the device."""
-        _ = version
-        _ = kwargs  # We don’t use version or kwargs for now.
+        _LOGGER.debug("async_install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
 
         upgrade_data = self.device._data.get("getUpgrade", {})
         job_item_id = upgrade_data.get("jobItemId")
@@ -115,7 +113,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
             _LOGGER.warning("No firmware update available for %s", self.device.name)
             return
 
-        _LOGGER.debug("Triggering firmware update for %s", self.device.name)
+        _LOGGER.debug("Triggering firmware update for %s (jobItemId=%s)", self.device.name, job_item_id)
         await self.device.api.trigger_firmware_upgrade(self.device.serial, job_item_id)
 
 DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
