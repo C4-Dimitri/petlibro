@@ -812,6 +812,20 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
 
+    async def trigger_firmware_upgrade(self, serial: str, job_item_id: str):
+        """Trigger the firmware upgrade for the device."""
+        _LOGGER.debug(f"Triggering firmware upgrade: serial={serial}, jobItemId={job_item_id}")
+        try:
+            response = await self.session.post("/device/ota/doUpgrade", json={
+                "deviceSn": serial,
+                "jobItemId": job_item_id
+            })
+            _LOGGER.debug(f"Firmware upgrade triggered successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to trigger firmware upgrade for device {serial}: {e}")
+            raise
+
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""
         await self.session.post("/device/device/doorStateChange", json={

@@ -249,6 +249,11 @@
             "display_text": {
                 "name": "Text on Display"
             }
+        },
+        "update": {
+            "update": {
+                "name": "Update"
+            }
         }
     }
 }
