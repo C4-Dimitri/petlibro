@@ -851,6 +851,26 @@ class PetLibroAPI:
             "soundEndTime": None
         })
 
+    async def set_light_on(self, serial: str):
+        """Trigger turn light on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": True,
+            "lightAgingType": 1,
+            "soundStartTime": None,
+            "soundEndTime": None
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn light off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": False,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None
+        })
+
     async def set_reposition_schedule(self, serial: str, plan: dict, template_name: str):
         """Reposition the schedule"""
         _LOGGER.debug(f"Triggering reposition schedule for device with serial: {serial}")

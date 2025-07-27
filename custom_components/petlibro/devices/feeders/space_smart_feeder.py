@@ -361,3 +361,23 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound level: {err}")
+
+    # Method for light turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the light for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the light for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the light: {err}")
+
+    # Method for light turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the light for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the light for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the light: {err}")
