@@ -9,8 +9,7 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import Any, cast
 from .const import DOMAIN
-from homeassistant.components.update.const import UpdateDeviceClass
-from homeassistant.components.update import UpdateEntity, UpdateEntityDescription, UpdateEntityFeature
+from homeassistant.components.update import UpdateDeviceClass, UpdateEntity, UpdateEntityDescription, UpdateEntityFeature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
@@ -33,7 +32,8 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
 class PetLibroUpdateEntityDescription(UpdateEntityDescription, PetLibroEntityDescription[_DeviceT]):
-    """A class that describes device update entities."""
+    """Describes PetLibro update entity."""
+
 
 class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     """PETLIBRO update entity."""
@@ -43,16 +43,19 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     def __init__(self, device, hub, description):
         """Initialize the update entity."""
         super().__init__(device, hub, description)
-        
-        # Ensure unique_id includes the device serial, specific update key, and the MAC address from the device attributes
+
         mac_address = getattr(device, "mac", None)
         if mac_address:
             self._attr_unique_id = f"{device.serial}-{description.key}-{mac_address.replace(':', '')}"
         else:
             self._attr_unique_id = f"{device.serial}-{description.key}"
-        
+
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
-        self._attr_supported_features = UpdateEntityFeature.INSTALL  # Optional
+        self._attr_supported_features = (
+            UpdateEntityFeature.INSTALL
+            | UpdateEntityFeature.PROGRESS
+            | UpdateEntityFeature.RELEASE_NOTES
+        )
         self._attr_title = f"{device.name} Firmware"
 
     @property
@@ -79,7 +82,13 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     @property
     def in_progress(self) -> bool:
         """Return if an update is currently in progress."""
-        return self.device.update_progress > 0.0 and self.device.update_progress < 100.0
+        return 0.0 < self.device.update_progress < 100.0
+
+    @property
+    def update_percentage(self) -> int | float | None:
+        """Return update installation progress as 0-100% or None."""
+        progress = self.device.update_progress
+        return float(progress) if progress and 0.0 < progress <= 100.0 else None
 
     @property
     def available(self) -> bool:
@@ -88,10 +97,8 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
         """Trigger firmware update on the device."""
-        # Marking arguments as unused since we always install the available version
         _ = version
-        _ = backup
-        _ = kwargs
+        _ = kwargs  # We don’t use version or kwargs for now.
 
         upgrade_data = self.device._data.get("getUpgrade", {})
         job_item_id = upgrade_data.get("jobItemId")
@@ -109,57 +116,49 @@ DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
     AirSmartFeeder: [
         PetLibroUpdateEntityDescription[AirSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     GranarySmartFeeder: [
         PetLibroUpdateEntityDescription[GranarySmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroUpdateEntityDescription[GranarySmartCameraFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroUpdateEntityDescription[OneRFIDSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     PolarWetFoodFeeder: [
         PetLibroUpdateEntityDescription[PolarWetFoodFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     SpaceSmartFeeder: [
         PetLibroUpdateEntityDescription[SpaceSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     DockstreamSmartFountain: [
         PetLibroUpdateEntityDescription[DockstreamSmartFountain](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroUpdateEntityDescription[DockstreamSmartRFIDFountain](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware"),
-            device_class=UpdateDeviceClass.FIRMWARE
+            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ]
 }
