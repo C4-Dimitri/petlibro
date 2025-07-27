@@ -871,7 +871,7 @@ class PetLibroAPI:
             "lightingEndTime": None
         })
 
-    async def set_light_on(self, serial: str):
+    async def set_sleep_on(self, serial: str):
         """Trigger turn sleep mode on"""
         await self.session.post("/device/setting/updateSleepModeSetting", json={
             "deviceSn": serial,
@@ -880,7 +880,7 @@ class PetLibroAPI:
             "sleepStartTime": None
         })
     
-    async def set_light_off(self, serial: str):
+    async def set_sleep_off(self, serial: str):
         """Trigger turn sleep mode off"""
         await self.session.post("/device/setting/updateSleepModeSetting", json={
             "deviceSn": serial,
