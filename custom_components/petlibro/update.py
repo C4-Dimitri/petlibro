@@ -58,20 +58,25 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         )
         self._attr_title = f"{device.name} Firmware"
 
+        # Default safe values so HA won't mark it Unknown on startup
+        self._attr_installed_version = "0.0.0"
+        self._attr_latest_version = "0.0.0"
+
     @property
     def installed_version(self) -> str:
-        version = getattr(self.device, "software_version", None)
-        value = version if version else "0.0.0"
-        _LOGGER.debug("installed_version returning: %s", value)
-        return value
+        version = getattr(self.device, "software_version", None) or "0.0.0"
+        _LOGGER.debug("installed_version returning: %s", version)
+        # Also update the cached value HA uses internally
+        self._attr_installed_version = version
+        return version
 
     @property
     def latest_version(self) -> str:
         version = self.device.update_version or self.installed_version
-        value = version if version else "0.0.0"
-        _LOGGER.debug("latest_version returning: %s", value)
-        return value
-
+        _LOGGER.debug("latest_version returning: %s", version)
+        self._attr_latest_version = version
+        return version
+    
     @property
     def release_summary(self) -> str:
         summary = self.device.update_release_notes
