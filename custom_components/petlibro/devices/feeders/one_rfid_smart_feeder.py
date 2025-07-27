@@ -116,7 +116,7 @@ class OneRFIDSmartFeeder(Device):
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
@@ -195,9 +195,9 @@ class OneRFIDSmartFeeder(Device):
         return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+        return cast(float, self._data.get("remainingDesiccantDays", 0))
     
     @property
     def desiccant_frequency(self) -> float:
@@ -247,6 +247,8 @@ class OneRFIDSmartFeeder(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+    
+    @property
     def sound_switch(self) -> bool:
         return self._data.get("realInfo", {}).get("soundSwitch", False)
 

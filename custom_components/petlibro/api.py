@@ -515,7 +515,7 @@ class PetLibroAPI:
 
     async def set_lid_close_time(self, serial: str, value: float):
         """Set the lid close time."""
-        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        _LOGGER.debug(f"Setting lid close time: serial={serial}, value={value}")
         try:
             response = await self.session.post("/device/setting/updateCoverSetting", json={
                 "deviceSn": serial,
@@ -544,6 +544,26 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
+            raise
+
+    async def set_vacuum_mode(self, serial: str, value: str):
+        """Set the vacuum mode."""
+        _LOGGER.debug(f"Setting vacuum mode: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/vacuum", json={
+                "deviceSn": serial,
+                "vacuumMode": value,
+                "requestId": request_id
+            })
+
+            # Check if response is already parsed (since response is an integer here)\
+            _LOGGER.debug(f"Vacuum mode successful, returned code: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
             raise
 
     async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
@@ -829,6 +849,44 @@ class PetLibroAPI:
             "soundAgingType": 1,
             "soundStartTime": None,
             "soundEndTime": None
+        })
+
+    async def set_light_on(self, serial: str):
+        """Trigger turn light on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": True,
+            "lightAgingType": 1,
+            "soundStartTime": None,
+            "soundEndTime": None
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn light off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": False,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None
+        })
+
+    async def set_sleep_on(self, serial: str):
+        """Trigger turn sleep mode on"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": True,
+            "sleepEndTime": None,
+            "sleepStartTime": None
+        })
+    
+    async def set_sleep_off(self, serial: str):
+        """Trigger turn sleep mode off"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": False,
+            "sleepEndTime": None,
+            "sleepStartTime": None
         })
 
     async def set_reposition_schedule(self, serial: str, plan: dict, template_name: str):

@@ -22,12 +22,14 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
             })
         except PetLibroAPIError as err:
@@ -92,7 +94,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:
@@ -167,10 +169,39 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
-    
+        return cast(float, self._data.get("remainingDesiccantDays", 0))
+
+    @property
+    def sound_switch(self) -> bool:
+        return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
+    def last_feed_time(self) -> str | None:
+        """Return the recordTime of the last successful grain output as a formatted string."""
+        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
+        raw = self._data.get("workRecord", [])
+
+        # Log raw to help debug
+        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
+
+        if not raw or not isinstance(raw, list):
+            return None
+
+        for day_entry in raw:
+            work_records = day_entry.get("workRecords", [])
+            for record in work_records:
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    timestamp_ms = record.get("recordTime", 0)
+                    if timestamp_ms:
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
+                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
+                        return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        return None
+
     @property
     def last_feed_time(self) -> str | None:
         """Return the recordTime of the last successful grain output as a formatted string."""
@@ -299,3 +330,99 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set feeding plan for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting feeding plan: {err}")
+
+    @property
+    def vacuum_mode(self) -> str:
+        api_value =  self._data.get("realInfo", {}).get("vacuumMode", "NORMAL")
+
+        # Direct mapping inside the property
+        if api_value == "LEARNING":
+            return "Study"
+        elif api_value == "NORMAL":
+            return "Normal"
+        elif api_value == "MANUAL":
+            return "Manual"
+        else:
+            return "Unknown"
+
+    async def set_vacuum_mode(self, value: str) -> None:
+        _LOGGER.debug(f"Setting vacuum mode to {value} for {self.serial}")
+        try:
+            await self.api.set_vacuum_mode(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set vacuum mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting vacuum mode: {err}")
+
+    # Method for sound turn on
+    async def set_sound_on(self) -> None:
+        _LOGGER.debug(f"Turning on the sound for {self.serial}")
+        try:
+            await self.api.set_sound_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the sound: {err}")
+
+    # Method for sound turn off
+    async def set_sound_off(self) -> None:
+        _LOGGER.debug(f"Turning off the sound for {self.serial}")
+        try:
+            await self.api.set_sound_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the sound for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the sound: {err}")
+
+    @property
+    def sound_level(self) -> float:
+        return self._data.get("getAttributeSetting", {}).get("volume", 0)
+
+    async def set_sound_level(self, value: float) -> None:
+        _LOGGER.debug(f"Setting sound level to {value} for {self.serial}")
+        try:
+            await self.api.set_sound_level(self.serial, value)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to set sound level for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting sound level: {err}")
+
+    # Method for light turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the light for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the light for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the light: {err}")
+
+    # Method for light turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the light for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the light for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the light: {err}")
+
+    # Method for light turn on
+    async def set_sleep_on(self) -> None:
+        _LOGGER.debug(f"Turning on sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on sleep mode: {err}")
+
+    # Method for light turn off
+    async def set_sleep_off(self) -> None:
+        _LOGGER.debug(f"Turning off sleep mode for {self.serial}")
+        try:
+            await self.api.set_sleep_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off sleep mode for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off sleep mode: {err}")

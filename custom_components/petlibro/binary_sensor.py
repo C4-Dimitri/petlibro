@@ -117,7 +117,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -159,7 +158,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -201,7 +199,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -259,7 +256,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -331,7 +327,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -365,7 +360,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="whether_in_sleep_mode",
             translation_key="whether_in_sleep_mode",
             icon="mdi:sleep",
-            device_class=BinarySensorDeviceClass.POWER,
             should_report=lambda device: device.whether_in_sleep_mode is not None,
             name="Sleep Mode"
         ),
@@ -376,6 +370,13 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             device_class=BinarySensorDeviceClass.BATTERY,
             should_report=lambda device: device.enable_low_battery_notice is not None,
             name="Battery Status"
+        ),
+        PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
+            key="sound_switch",
+            translation_key="sound_switch",
+            icon="mdi:volume-high",
+            should_report=lambda device: device.sound_switch is not None,
+            name="Sound Status"
         ),
     ],
     DockstreamSmartFountain: [
