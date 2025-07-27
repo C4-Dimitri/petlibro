@@ -59,19 +59,18 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
         self._attr_title = f"{device.name} Firmware"
 
     @property
-    def latest_version(self) -> str | None:
-        """Return the latest firmware version available, or fallback to installed."""
-        version = self.device.update_version
-        if version:
-            return version
-        # Fallback: just use installed version so HA doesn't think it's unknown
-        return self.installed_version
+    def installed_version(self) -> str:
+        version = getattr(self.device, "software_version", None)
+        value = version if version else "0.0.0"
+        _LOGGER.debug("installed_version returning: %s", value)
+        return value
 
     @property
     def latest_version(self) -> str:
         version = self.device.update_version or self.installed_version
-        _LOGGER.debug("latest_version returning: %s", version)
-        return version
+        value = version if version else "0.0.0"
+        _LOGGER.debug("latest_version returning: %s", value)
+        return value
 
     @property
     def release_summary(self) -> str:
