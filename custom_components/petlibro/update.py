@@ -116,49 +116,41 @@ DEVICE_UPDATE_MAP: dict[type[Device], list[PetLibroUpdateEntityDescription]] = {
     AirSmartFeeder: [
         PetLibroUpdateEntityDescription[AirSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     GranarySmartFeeder: [
         PetLibroUpdateEntityDescription[GranarySmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroUpdateEntityDescription[GranarySmartCameraFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroUpdateEntityDescription[OneRFIDSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     PolarWetFoodFeeder: [
         PetLibroUpdateEntityDescription[PolarWetFoodFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     SpaceSmartFeeder: [
         PetLibroUpdateEntityDescription[SpaceSmartFeeder](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     DockstreamSmartFountain: [
         PetLibroUpdateEntityDescription[DockstreamSmartFountain](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroUpdateEntityDescription[DockstreamSmartRFIDFountain](
             key="firmware",
-            supported=lambda api, ch: api.supported(ch, "firmware")
         ),
     ]
 }
