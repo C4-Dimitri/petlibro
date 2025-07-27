@@ -49,7 +49,7 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
         self._attr_device_class = UpdateDeviceClass.FIRMWARE
         self._attr_supported_features = (
-            UpdateEntityFeature.INSTALL | UpdateEntityFeature.RELEASE_NOTES
+            UpdateEntityFeature.INSTALL
         )
         self._attr_title = f"{device.name} Firmware"
 
