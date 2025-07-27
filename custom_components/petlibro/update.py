@@ -70,39 +70,41 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
 
     @property
     def installed_version(self) -> str:
-        version = getattr(self.device, "software_version", None) or "0.0.0"
-        _LOGGER.debug("installed_version returning: %s", version)
-        # Also update the cached value HA uses internally
-        self._attr_installed_version = version
-        return version
+        version = getattr(self.device, "software_version", None)
+        value = version if version else self._attr_installed_version
+        _LOGGER.debug("installed_version returning: %s", value)
+        return value
 
     @property
     def latest_version(self) -> str:
         version = self.device.update_version or self.installed_version
-        _LOGGER.debug("latest_version returning: %s", version)
-        self._attr_latest_version = version
-        return version
-    
+        value = version if version else self._attr_latest_version
+        _LOGGER.debug("latest_version returning: %s", value)
+        return value
+
     @property
     def release_summary(self) -> str:
         summary = self.device.update_release_notes
-        return summary if summary else "Device firmware is up to date."
+        value = summary if summary else self._attr_release_summary
+        _LOGGER.debug("release_summary returning: %s", value)
+        return value
 
     @property
     def release_url(self) -> str:
         url = self.device._data.get("getUpgrade", {}).get("upgradeUrl", "")
-        return url or ""
+        value = url if url else self._attr_release_url
+        _LOGGER.debug("release_url returning: %s", value)
+        return value
 
     @property
     def title(self) -> str:
-        """Return title of the firmware/software."""
-        value = f"{self.device.name} Firmware"
+        value = f"{self.device.name} Firmware" if self.device.name else self._attr_title
         _LOGGER.debug("title returning: %s", value)
         return value
 
     @property
     def display_precision(self) -> int:
-        value = 0
+        value = self._attr_display_precision
         _LOGGER.debug("display_precision returning: %s", value)
         return value
 
@@ -110,19 +112,22 @@ class PetLibroUpdateEntity(PetLibroEntity[_DeviceT], UpdateEntity):
     def in_progress(self) -> bool:
         progress = self.device.update_progress
         in_progress = progress is not None and 0.0 < progress < 100.0
-        _LOGGER.debug("in_progress returning: %s (progress=%s)", in_progress, progress)
-        return in_progress
+        value = in_progress if in_progress is not None else self._attr_in_progress
+        _LOGGER.debug("in_progress returning: %s (progress=%s)", value, progress)
+        return value
 
     @property
     def update_percentage(self) -> float | None:
         progress = self.device.update_progress
-        value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else None
+        value = float(progress) if progress is not None and 0.0 < progress <= 100.0 else self._attr_update_percentage
         _LOGGER.debug("update_percentage returning: %s (raw progress=%s)", value, progress)
         return value
 
     @property
     def available(self) -> bool:
-        return True
+        value = True
+        _LOGGER.debug("available returning: %s", value)
+        return value
 
     async def async_install(self, version: str | None, backup: bool, **kwargs):
         _LOGGER.debug("Install called with version=%s backup=%s kwargs=%s", version, backup, kwargs)
