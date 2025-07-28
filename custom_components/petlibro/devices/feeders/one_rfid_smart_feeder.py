@@ -226,7 +226,6 @@ class OneRFIDSmartFeeder(Device):
                         dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc)
                         _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
                         return dt
-
         return None
     
     @property

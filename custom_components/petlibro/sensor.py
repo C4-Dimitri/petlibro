@@ -302,7 +302,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time"
+            name="Last Feed Time",
+            device_class=SensorDeviceClass.TIMESTAMP,
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
             key="child_lock_switch",
@@ -385,7 +386,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time"
+            name="Last Feed Time",
+            device_class=SensorDeviceClass.TIMESTAMP,
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="child_lock_switch",
@@ -469,7 +471,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time"
+            name="Last Feed Time",
+            device_class=SensorDeviceClass.TIMESTAMP,
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="child_lock_switch",
@@ -761,7 +764,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time"
+            name="Last Feed Time",
+            device_class=SensorDeviceClass.TIMESTAMP,
         ),
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
             key="pump_air_state",
