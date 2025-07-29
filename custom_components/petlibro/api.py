@@ -811,6 +811,26 @@ class PetLibroAPI:
             "screenDisplaySwitch": False
         })
 
+    async def set_light_on(self, serial: str):
+        """Trigger turn indicator on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": True
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn indicator off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": False
+        })
+
     async def set_sound_on(self, serial: str):
         """Trigger turn sound on"""
         await self.session.post("/device/setting/updateSoundSetting", json={

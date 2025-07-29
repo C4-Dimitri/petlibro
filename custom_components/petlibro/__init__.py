@@ -33,18 +33,27 @@ PLATFORMS_BY_TYPE = {
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     GranarySmartFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     GranarySmartCameraFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
@@ -60,12 +69,18 @@ PLATFORMS_BY_TYPE = {
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     SpaceSmartFeeder: (
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     DockstreamSmartFountain: (
         Platform.SENSOR,
@@ -74,6 +89,7 @@ PLATFORMS_BY_TYPE = {
         Platform.BUTTON,
         Platform.NUMBER,
         Platform.SELECT,
+        Platform.TEXT,
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
@@ -82,6 +98,7 @@ PLATFORMS_BY_TYPE = {
         Platform.BUTTON,
         Platform.NUMBER,
         Platform.SELECT,
+        Platform.TEXT,
     ),
 }
 

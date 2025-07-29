@@ -209,6 +209,9 @@
             },
             "display_switch": {
                 "name": "Display Status"
+            },
+            "light": {
+                "name": "Indicator"
             }
         },
         "number": {
