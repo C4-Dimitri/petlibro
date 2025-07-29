@@ -302,8 +302,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
             key="child_lock_switch",
@@ -386,8 +385,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="child_lock_switch",
@@ -471,8 +469,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="child_lock_switch",
@@ -603,8 +600,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="display_selection",
@@ -764,8 +760,7 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="last_feed_time",
             translation_key="last_feed_time",
             icon="mdi:history",
-            name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
+            name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
             key="pump_air_state",

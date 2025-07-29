@@ -6,6 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
+from datetime import datetime
 
 _LOGGER = getLogger(__name__)
 
