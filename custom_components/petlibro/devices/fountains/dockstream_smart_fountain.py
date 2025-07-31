@@ -232,13 +232,3 @@ class DockstreamSmartFountain(Device):
     def use_water_duration(self) -> int:
         """Get the water usage duration."""
         return self._data.get("realInfo", {}).get("useWaterDuration", 0)
-    
-    @property
-    def filter_replacement_frequency(self) -> int:
-        """Get the filter replacement frequency."""
-        return self._data.get("realInfo", {}).get("filterReplacementFrequency", 0)
-    
-    @property
-    def machine_cleaning_frequency(self) -> int:
-        """Get the machine cleaning frequency."""
-        return self._data.get("realInfo", {}).get("machineCleaningFrequency", 0)
