@@ -40,7 +40,7 @@
                 "name": "Force du signal Wi-Fi"
             },
             "remaining_desiccant": {
-                "name": "Dessicant Days restants"
+                "name": "Dessiccant Days restants"
             },
             "battery_state": {
                 "name": "Niveau de la batterie"
@@ -164,7 +164,7 @@
                 "name": "Éteindre le son"
             },
             "desiccant_reset": {
-                "name": "Desiccant remplacé"
+                "name": "Dessicant remplacé"
             },
             "ring_bell": {
                 "name": "Sonnerie"
