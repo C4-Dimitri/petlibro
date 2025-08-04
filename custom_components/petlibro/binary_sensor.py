@@ -341,6 +341,22 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Food Dispenser"
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
+            key="food_outlet_state",
+            translation_key="food_outlet_state",
+            icon="mdi:door",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.food_outlet_state is not None,
+            name="Food Outlet"
+        ),
+        PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
+            key="vacuum_state",
+            translation_key="vacuum_state",
+            icon="mdi:air-filter",
+            device_class=BinarySensorDeviceClass.PROBLEM,
+            should_report=lambda device: device.vacuum_state is not None,
+            name="Vacuum State"
+        ),
+        PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
             key="food_low",
             translation_key="food_low",
             icon="mdi:bowl-mix-outline",

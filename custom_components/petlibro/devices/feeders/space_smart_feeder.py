@@ -24,13 +24,15 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_device_events = await self.api.device_events(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "getDeviceEvents": get_device_events or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
@@ -60,10 +62,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     @property
     def battery_state(self) -> str:
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
-
-    @property
-    def food_dispenser_state(self) -> bool:
-        return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
 
     @property
     def food_low(self) -> bool:
@@ -176,6 +174,21 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     @property
     def sound_switch(self) -> bool:
         return self._data.get("realInfo", {}).get("soundSwitch", False)
+
+    @property
+    def vacuum_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "VACUUM_FAILED" for event in events)
+
+    @property
+    def food_dispenser_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "GRAIN_OUTLET_BLOCKED_OVERTIME" for event in events)
+
+    @property
+    def food_outlet_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "FOOD_OUTLET_DOOR_FAILED_CLOSE" for event in events)
 
     @property
     def last_feed_time(self) -> str | None:
