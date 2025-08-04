@@ -346,6 +346,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
 
+    async def get_device_events(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_events")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping deviceEvents request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_events", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/data/event/deviceEventsV2", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_events"] = now
+            self._cached_responses[f"{device_id}_events"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching deviceEvents for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching deviceEvents for device {device_id}: {e}")
+
     async def get_default_matrix(self, device_sn: str) -> dict:
         """
         Fetch the default matrix for a device using a GET request.
@@ -408,6 +433,9 @@ class PetLibroAPI:
 
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
+
+    async def device_events(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/data/event/deviceEventsV2", serial)
 
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)

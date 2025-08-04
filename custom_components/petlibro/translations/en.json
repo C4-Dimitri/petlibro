@@ -201,6 +201,12 @@
             "food_dispenser_state": {
                 "name": "Food Dispenser"
             },
+            "food_outlet_state": {
+                "name": "Food Outlet"
+            },
+            "vacuum_state": {
+                "name": "Vacuum State"
+            },
             "door_blocked": {
                 "name": "Lid Status"
             },

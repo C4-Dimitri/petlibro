@@ -24,13 +24,15 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
             real_info = await self.api.device_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_device_events = await self.api.device_events(self.serial)
     
             # Update internal data with fetched API data
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
                 "getAttributeSetting": attribute_settings or {},
-                "getfeedingplantoday": get_feeding_plan_today or {}
+                "getfeedingplantoday": get_feeding_plan_today or {},
+                "getDeviceEvents": get_device_events or {}
             })
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for SpaceSmartFeeder: {err}")
@@ -60,10 +62,6 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     @property
     def battery_state(self) -> str:
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
-
-    @property
-    def food_dispenser_state(self) -> bool:
-        return not bool(self._data.get("realInfo", {}).get("grainOutletState", True))
 
     @property
     def food_low(self) -> bool:
@@ -178,29 +176,19 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return self._data.get("realInfo", {}).get("soundSwitch", False)
 
     @property
-    def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output as a formatted string."""
-        _LOGGER.debug("last_feed_time called for device: %s", self.serial)
-        raw = self._data.get("workRecord", [])
+    def vacuum_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "VACUUM_FAILED" for event in events)
 
-        # Log raw to help debug
-        _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
+    @property
+    def food_dispenser_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "GRAIN_OUTLET_BLOCKED_OVERTIME" for event in events)
 
-        if not raw or not isinstance(raw, list):
-            return None
-
-        for day_entry in raw:
-            work_records = day_entry.get("workRecords", [])
-            for record in work_records:
-                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
-                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    timestamp_ms = record.get("recordTime", 0)
-                    if timestamp_ms:
-                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
-                        return dt.strftime("%Y-%m-%d %H:%M:%S")
-
-        return None
+    @property
+    def food_outlet_state(self) -> bool:
+        events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
+        return any(event.get("eventKey") == "FOOD_OUTLET_DOOR_FAILED_CLOSE" for event in events)
 
     @property
     def last_feed_time(self) -> str | None:
