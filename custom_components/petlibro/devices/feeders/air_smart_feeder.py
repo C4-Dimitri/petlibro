@@ -200,6 +200,20 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return None
 
     @property
+    def last_feed_quantity(self) -> float | None:
+        """Return the last feed amount in raw grain count."""
+        raw = self._data.get("workRecord", [])
+        if not raw or not isinstance(raw, list):
+            return None
+
+        for day_entry in raw:
+            for record in day_entry.get("workRecords", []):
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    return record.get("actualGrainNum") or "Unknown"
+        return None
+
+    @property
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
 

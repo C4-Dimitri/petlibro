@@ -63,6 +63,9 @@
             "last_feed_time": {
                 "name": "Last Feed Time"
             },
+            "last_feed_quantity": {
+                "name": "Last Feed Quantity"
+            },
             "feeding_plan_state": {
                 "name": "Today's Feeding Plan"
             },

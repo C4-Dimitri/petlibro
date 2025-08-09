@@ -103,8 +103,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             eating_time_seconds = getattr(self.device, sensor_key, 0)
             return eating_time_seconds
 
-        # Handle today_feeding_quantity as raw numeric value, converting to cups
-        elif sensor_key == "today_feeding_quantity":
+        # Handle today_feeding_quantity or last_feed_amount as raw numeric value, converting to cups
+        elif sensor_key == ["today_feeding_quantity","last_feed_amount"]:
             feeding_quantity = getattr(self.device, sensor_key, 0)
             # Determine the conversion factor based on device-specific attributes or context
             conversion_factor = 1 / 12  # Default conversion factor
@@ -152,8 +152,8 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For temperature, display as Fahrenheit
         if self.entity_description.key == "temperature":
             return "°F"
-        # For today_feeding_quantity, display as cups in the frontend
-        if self.entity_description.key == "today_feeding_quantity":
+        # For today_feeding_quantity or last_feed_amount, display as cups in the frontend
+        if self.entity_description.key == ["today_feeding_quantity","last_feed_amount"]:
             return "cups"
         # For today_eating_time, display as seconds in the frontend
         elif self.entity_description.key == "today_eating_time":
@@ -303,6 +303,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="last_feed_time",
             icon="mdi:history",
             name="Last Feed Time"
+        ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="last_feed_quantity",
+            translation_key="last_feed_quantity",
+            icon="mdi:history",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Last Feed Quantity"
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
             key="child_lock_switch",
