@@ -105,7 +105,13 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
 
         # Handle today_feeding_quantity or last_feed_quantity as raw numeric value, converting to cups
         elif sensor_key in ["today_feeding_quantity","last_feed_quantity"]:
-            feeding_quantity = getattr(self.device, sensor_key, 0)
+            feeding_quantity = getattr(self.device, sensor_key, 0) or 0
+            if not isinstance(feeding_quantity, (int, float)):
+                try:
+                    feeding_quantity = float(feeding_quantity)
+                except (TypeError, ValueError):
+                    return None  # don't crash; show 'unknown' until there’s a number
+                
             # Determine the conversion factor based on device-specific attributes or context
             conversion_factor = 1 / 12  # Default conversion factor
             if hasattr(self.device, "conversion_mode") and self.device.conversion_mode == "1/24":
