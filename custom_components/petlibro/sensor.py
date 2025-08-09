@@ -103,7 +103,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             eating_time_seconds = getattr(self.device, sensor_key, 0)
             return eating_time_seconds
 
-        # Handle today_feeding_quantity or last_feed_amount as raw numeric value, converting to cups
+        # Handle today_feeding_quantity or last_feed_quantity as raw numeric value, converting to cups
         elif sensor_key in ["today_feeding_quantity","last_feed_quantity"]:
             feeding_quantity = getattr(self.device, sensor_key, 0)
             # Determine the conversion factor based on device-specific attributes or context
@@ -152,7 +152,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For temperature, display as Fahrenheit
         if self.entity_description.key == "temperature":
             return "°F"
-        # For today_feeding_quantity or last_feed_amount, display as cups in the frontend
+        # For today_feeding_quantity or last_feed_quantity, display as cups in the frontend
         if self.entity_description.key in ["today_feeding_quantity","last_feed_quantity"]:
             return "cups"
         # For today_eating_time, display as seconds in the frontend
