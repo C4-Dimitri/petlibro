@@ -239,7 +239,7 @@ class OneRFIDSmartFeeder(Device):
             for record in day_entry.get("workRecords", []):
                 _LOGGER.debug("Evaluating record type: %s", record.get("type"))
                 if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
-                    return record.get("actualGrainNum") or "Unknown"
+                    return record.get("actualGrainNum") or 0
         return None
 
     @property
