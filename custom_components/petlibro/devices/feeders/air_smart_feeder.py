@@ -200,7 +200,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return None
 
     @property
-    def last_feed_quantity(self) -> float | None:
+    def last_feed_quantity(self) -> int | None:
         """Return the last feed amount in raw grain count."""
         raw = self._data.get("workRecord", [])
         if not raw or not isinstance(raw, list):
