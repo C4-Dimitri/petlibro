@@ -403,6 +403,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Last Feed Time"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
+            key="last_feed_quantity",
+            translation_key="last_feed_quantity",
+            icon="mdi:history",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Last Feed Quantity"
+        ),
+        PetLibroSensorEntityDescription[GranarySmartFeeder](
             key="child_lock_switch",
             translation_key="child_lock_switch",
             icon="mdi:lock",
@@ -485,6 +494,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="last_feed_time",
             icon="mdi:history",
             name="Last Feed Time"
+        ),
+        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
+            key="last_feed_quantity",
+            translation_key="last_feed_quantity",
+            icon="mdi:history",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Last Feed Quantity"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
             key="child_lock_switch",
@@ -785,6 +803,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="last_feed_time",
             icon="mdi:history",
             name="Last Feed Time"
+        ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="last_feed_quantity",
+            translation_key="last_feed_quantity",
+            icon="mdi:history",
+            native_unit_of_measurement_fn=unit_of_measurement_feeder,
+            device_class_fn=device_class_feeder,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Last Feed Quantity"
         ),
         PetLibroSensorEntityDescription[SpaceSmartFeeder](
             key="pump_air_state",
