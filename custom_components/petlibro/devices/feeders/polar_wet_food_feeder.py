@@ -184,23 +184,24 @@ class PolarWetFoodFeeder(Device):
             raise PetLibroAPIError(f"Error triggering manual feed now: {err}")
     
     async def set_plate_position(self, value: str | int) -> None:
-        """Rotate bowl to requested plate (1..3) without changing lid."""
+        """Rotate bowl to requested plate (1-3)"""
         try:
             target = int(value)
         except (TypeError, ValueError):
             raise PetLibroAPIError(f"Invalid plate value: {value!r}")
         if target not in (1, 2, 3):
-            raise PetLibroAPIError(f"Plate must be 1..3, got {target}")
+            # Raise an error if plate count somehow became less than 1 or more than 3.
+            raise PetLibroAPIError(f"Plate must be 1, 2, or 3, got {target}")
 
         # Ensure we know current position
         if not self.plate_position:
             await self.refresh()
         curr = self.plate_position or 1
 
-        steps = (target - curr) % 3  # 0..2 minimal forward steps
-        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s",
-                    curr, target, steps, self.serial)
+        steps = (target - curr) % 3
+        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s", curr, target, steps, self.serial)
 
+        # didnt test other cooldowns, may be able reduce.
         ROTATE_COOLDOWN = 0.6
         for _ in range(steps):
             await self.api.set_rotate_food_bowl(self.serial)
