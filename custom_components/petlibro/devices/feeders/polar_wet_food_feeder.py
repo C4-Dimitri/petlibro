@@ -2,6 +2,7 @@ import aiohttp
 
 from ...api import make_api_call
 from aiohttp import ClientSession, ClientError
+import asyncio
 from datetime import datetime
 from ...exceptions import PetLibroAPIError
 from ..device import Device
@@ -167,19 +168,47 @@ class PolarWetFoodFeeder(Device):
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
 
-    async def set_manual_feed_now(self, start: bool) -> None:
+    async def set_manual_feed_now(self, start: bool, plate: int) -> None:
+        plate = plate if plate is not None else self.plate_position
         try:
             if start:
-                _LOGGER.debug(f"Triggering manual feed now for {self.serial}")
-                await self.api.set_manual_feed_now(self.serial)
+                _LOGGER.debug(f"Triggering manual feed now for {self.serial} with plate no.{plate}")
+                await self.api.set_manual_feed_now(self.serial, plate)
             else:
                 _LOGGER.debug(f"Triggering stop feed now for {self.serial}")
                 await self.api.set_stop_feed_now(self.serial, self.manual_feed_id)
             
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to trigger manual feed now for {self.serial}: {err}")
+            _LOGGER.error(f"Failed to trigger manual feed now for {self.serial} with plate no.{plate}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed now: {err}")
+    
+    async def set_plate_position(self, value: str | int) -> None:
+        """Rotate bowl to requested plate (1..3) without changing lid."""
+        try:
+            target = int(value)
+        except (TypeError, ValueError):
+            raise PetLibroAPIError(f"Invalid plate value: {value!r}")
+        if target not in (1, 2, 3):
+            raise PetLibroAPIError(f"Plate must be 1..3, got {target}")
+
+        # Ensure we know current position
+        if not self.plate_position:
+            await self.refresh()
+        curr = self.plate_position or 1
+
+        steps = (target - curr) % 3  # 0..2 minimal forward steps
+        _LOGGER.debug("Rotate-to-plate: curr=%s target=%s steps=%s for %s",
+                    curr, target, steps, self.serial)
+
+        ROTATE_COOLDOWN = 0.6
+        for _ in range(steps):
+            await self.api.set_rotate_food_bowl(self.serial)
+            await asyncio.sleep(ROTATE_COOLDOWN)
+            await self.refresh()
+
+        # Final refresh so sensor/current_option show the target
+        await self.refresh()
 
     async def rotate_food_bowl(self) -> None:
         _LOGGER.debug(f"Triggering rotate food bowl for {self.serial}")
