@@ -59,6 +59,7 @@ PLATFORMS_BY_TYPE = {
         Platform.SENSOR,
         Platform.BINARY_SENSOR,
         Platform.SWITCH,
+        Platform.SELECT,
         Platform.BUTTON,
     ),
     SpaceSmartFeeder: (
