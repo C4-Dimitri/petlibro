@@ -118,7 +118,7 @@
                 "name": "Temperature"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Plate Position"
             },
             "display_selection": {
                 "name": "Display Value"
@@ -240,6 +240,9 @@
             },
             "water_dispensing_mode": {
                 "name": "Water Dispensing Mode"
+            },
+            "plate_position": {
+                "name": "Plate Position"
             }
         },
         "text": {
