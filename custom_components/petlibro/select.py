@@ -90,6 +90,16 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         )
         return str(state)
 
+    async def async_select_option(self, current_selection: str) -> None:
+        """Set the current_option of the select."""
+        _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
+        try:
+            _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
+            await self.entity_description.method(self.device, current_selection)
+            _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
+        except Exception as e:
+            _LOGGER.error(f"Error setting current option {current_selection} for {self.device.name}: {e}")
+
     @staticmethod
     def map_value_to_api(*, key: str, current_selection: str) -> str:
         """Map user-friendly values to API-compatible values."""

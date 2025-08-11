@@ -118,7 +118,7 @@
                 "name": "Temperature"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Plate Position"
             },
             "display_selection": {
                 "name": "Display Value"
