@@ -509,7 +509,7 @@ class PetLibroAPI:
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
                     "deviceSn": serial,
-                    "key": "DESSICANT",
+                    "key": "DESICCANT",  # Try and find a way to make this dynamic as different devices may have a different key. if too difficult we could just duplicate this block for each key type.
                     "frequency": value,
                     "requestId": request_id,
                     "timeout": 5000

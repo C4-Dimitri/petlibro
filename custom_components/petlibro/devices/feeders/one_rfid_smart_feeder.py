@@ -202,7 +202,7 @@ class OneRFIDSmartFeeder(Device):
         return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
     
     @property
-    def desiccant_cycle(self) -> float:
+    def desiccant_frequency(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
     @property

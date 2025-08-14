@@ -163,7 +163,7 @@
             "sound_off": {
                 "name": "Apagar el sonido"
             },
-            "desiccant_frequency": {
+            "desiccant_reset": {
                 "name": "Desecante reemplazado"
             },
             "ring_bell": {
@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "Nivel de volumen"
             },
-            "desiccant_cycle": {
+            "desiccant_frequency": {
                 "name": "Frecuencia desecante"
             },
             "lid_close_time": {
