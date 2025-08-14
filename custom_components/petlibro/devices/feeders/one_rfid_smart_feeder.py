@@ -210,13 +210,13 @@ class OneRFIDSmartFeeder(Device):
         """Return the recordTime of the last successful grain output as a datetime object."""
         _LOGGER.debug("last_feed_time called for device: %s", self.serial)
         raw = self._data.get("workRecord", [])
-
+        
         # Log raw to help debug
         _LOGGER.debug("Raw workRecord (from self._data): %s", raw)
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:

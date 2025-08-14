@@ -182,6 +182,11 @@
             "reposition_schedule": {
                 "name": "Reposition Schedule"
             },
+            "light_on": {
+                "name": "Turn On Indicator"
+            },
+            "light_off": {
+                "name": "Turn Off Indicator"
             "cleaning_reset": {
                 "name": "Cleaning Reset"
             },
@@ -219,6 +224,9 @@
             },
             "display_switch": {
                 "name": "Display Status"
+            },
+            "light": {
+                "name": "Indicator"
             }
         },
         "number": {
