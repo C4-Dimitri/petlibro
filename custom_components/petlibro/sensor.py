@@ -356,6 +356,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[GranarySmartFeeder](
@@ -448,7 +451,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
-            native_unit_of_measurement="days",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
@@ -576,6 +581,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_desiccant",
             translation_key="remaining_desiccant",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Desiccant Days"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
@@ -627,7 +635,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="today_eating_time",
             translation_key="today_eating_time",
             icon="mdi:history",
-            name="Last Feed Time"
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today's Total Eating Time"
         ),
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
             key="last_feed_time",
@@ -850,6 +859,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_cleaning_days",
             translation_key="remaining_cleaning_days",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Cleaning Days"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
@@ -886,7 +898,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_filter_days",
             translation_key="remaining_filter_days",
             icon="mdi:package",
-            native_unit_of_measurement="days",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Filter Days"
         ),
     ],
@@ -920,6 +934,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_cleaning_days",
             translation_key="remaining_cleaning_days",
             icon="mdi:package",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Cleaning Days"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
@@ -943,6 +960,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="use_water_interval",
             icon="mdi:water",
             native_unit_of_measurement="min",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Water Interval"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
@@ -950,6 +969,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="use_water_duration",
             icon="mdi:water",
             native_unit_of_measurement="min",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Water Time Duration"
         ),
 # Does not work with multi pet tracking, but may use this code later once I have the API info for the RFID tags.
@@ -965,7 +986,9 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             key="remaining_filter_days",
             translation_key="remaining_filter_days",
             icon="mdi:package",
-            native_unit_of_measurement="days",
+            native_unit_of_measurement="d",
+            device_class=SensorDeviceClass.DURATION,
+            state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Filter Days"
         ),
     ]
