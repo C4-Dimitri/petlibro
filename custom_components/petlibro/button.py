@@ -65,13 +65,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[AirSmartFeeder](
             key="light_on",
             translation_key="light_on",
             set_fn=lambda device: device.set_light_on(),
             name="Turn On Indicator"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[AirSmartFeeder](
             key="light_off",
             translation_key="light_off",
             set_fn=lambda device: device.set_light_off(),
@@ -97,13 +97,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
             key="light_on",
             translation_key="light_on",
             set_fn=lambda device: device.set_light_on(),
             name="Turn On Indicator"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
             key="light_off",
             translation_key="light_off",
             set_fn=lambda device: device.set_light_off(),
@@ -129,13 +129,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
             key="light_on",
             translation_key="light_on",
             set_fn=lambda device: device.set_light_on(),
             name="Turn On Indicator"
         ),
-        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
             key="light_off",
             translation_key="light_off",
             set_fn=lambda device: device.set_light_off(),
