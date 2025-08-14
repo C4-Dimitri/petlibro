@@ -119,8 +119,8 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Study": "LEARNING",
                 "Normal": "NORMAL",
                 "Manual": "MANUAL"
-            }.
-            "plate_position":{
+            },
+            "plate_position": {
                 "Plate 1": 1,
                 "Plate 2": 2,
                 "Plate 3": 3,
