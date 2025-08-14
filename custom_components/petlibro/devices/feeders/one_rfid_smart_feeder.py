@@ -6,7 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
-from datetime import datetime
+from datetime import datetime, timezone
 
 _LOGGER = getLogger(__name__)
 
@@ -24,6 +24,7 @@ class OneRFIDSmartFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            get_upgrade = await self.api.get_device_upgrade(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_default_matrix = await self.api.get_default_matrix(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
@@ -33,6 +34,7 @@ class OneRFIDSmartFeeder(Device):
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getUpgrade": get_upgrade or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getDefaultMatrix": get_default_matrix or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
@@ -195,17 +197,17 @@ class OneRFIDSmartFeeder(Device):
         return not self._data.get("realInfo", {}).get("childLockSwitch", False)
 
     @property
-    def remaining_desiccant(self) -> str:
+    def remaining_desiccant(self) -> float:
         """Get the remaining desiccant days."""
-        return cast(str, self._data.get("remainingDesiccantDays", "unknown"))
+        return cast(float, self._data.get("remainingDesiccantDays", 0))
     
     @property
-    def desiccant_frequency(self) -> float:
+    def desiccant_cycle(self) -> float:
         return self._data.get("realInfo", {}).get("changeDesiccantFrequency", 0)
     
     @property
-    def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output as a formatted string."""
+    def last_feed_time(self) -> datetime | None:
+        """Return the recordTime of the last successful grain output as a datetime object."""
         _LOGGER.debug("last_feed_time called for device: %s", self.serial)
         raw = self._data.get("workRecord", [])
         
@@ -222,11 +224,26 @@ class OneRFIDSmartFeeder(Device):
                 if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
                     timestamp_ms = record.get("recordTime", 0)
                     if timestamp_ms:
-                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
-                        return dt.strftime("%Y-%m-%d %H:%M:%S")
+                        # Convert to timezone-aware UTC datetime
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc)
+                        _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
+                        return dt
         return None
     
+    @property
+    def last_feed_quantity(self) -> int | None:
+        """Return the last feed amount in raw grain count."""
+        raw = self._data.get("workRecord", [])
+        if not raw or not isinstance(raw, list):
+            return 0
+
+        for day_entry in raw:
+            for record in day_entry.get("workRecords", []):
+                _LOGGER.debug("Evaluating record type: %s", record.get("type"))
+                if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
+                    return record.get("actualGrainNum") or 0
+        return 0
+
     @property
     def feeding_plan_today_data(self) -> str:
         return self._data.get("getfeedingplantoday", {})
@@ -238,14 +255,17 @@ class OneRFIDSmartFeeder(Device):
             self._manual_feed_quantity = 1  # Default value
         return self._manual_feed_quantity
 
-    async def set_desiccant_frequency(self, value: float) -> None:
-        _LOGGER.debug(f"Setting desiccant frequency to {value} for {self.serial}")
+    async def set_desiccant_cycle(self, value: float) -> None:
+        _LOGGER.debug(f"Setting desiccant cycle to {value} for {self.serial}")
         try:
-            await self.api.set_desiccant_frequency(self.serial, value)
+            key = "DESSICANT"
+            await self.api.set_desiccant_cycle(self.serial, value, key)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set desiccant frequency for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting desiccantfrequency: {err}")
+            _LOGGER.error(f"Failed to set desiccant cycle for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting desiccant cycle: {err}")
+    
+    @property
     def sound_switch(self) -> bool:
         return self._data.get("realInfo", {}).get("soundSwitch", False)
 
@@ -531,3 +551,36 @@ class OneRFIDSmartFeeder(Device):
             return f"Displaying Icon: {icon_map.get(display_icon, 'Unknown')}"
 
         return "No valid display data found"
+
+    @property
+    def update_available(self) -> bool:
+        """Return True if an update is available, False otherwise."""
+        return bool(self._data.get("getUpgrade", {}).get("jobItemId"))
+    
+    @property
+    def update_release_notes(self) -> str | None:
+        """Return release notes if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("upgradeDesc") if upgrade_data else None
+    
+    @property
+    def update_version(self) -> str | None:
+        """Return target version if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("targetVersion") if upgrade_data else None
+    
+    @property
+    def update_name(self) -> str | None:
+        """Return update job name if available, else None."""
+        upgrade_data = self._data.get("getUpgrade")
+        return upgrade_data.get("jobName") if upgrade_data else None
+    
+    @property
+    def update_progress(self) -> float:
+        """Return update progress as a float, or 0 if not updating."""
+        upgrade_data = self._data.get("getUpgrade")
+        if not upgrade_data:
+            return 0.0
+
+        progress = upgrade_data.get("progress")
+        return float(progress) if progress is not None else 0.0
