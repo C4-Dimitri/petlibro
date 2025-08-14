@@ -163,7 +163,7 @@
             "sound_off": {
                 "name": "Apagar el sonido"
             },
-            "desiccant_reset": {
+            "desiccant_frequency": {
                 "name": "Desecante reemplazado"
             },
             "ring_bell": {

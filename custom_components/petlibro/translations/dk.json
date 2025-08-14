@@ -212,7 +212,7 @@
             "sound_level": {
                 "name": "Lydstyrkeniveau"
             },
-            "desiccant_cycle": {
+            "desiccant_frequency": {
                 "name": "Tørremiddelfrekvens"
             },
             "lid_close_time": {

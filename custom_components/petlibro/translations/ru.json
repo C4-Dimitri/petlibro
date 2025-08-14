@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "Уровень объема"
             },
-            "desiccant_cycle": {
+            "desiccant_frequency": {
                 "name": "Исчезающая частота"
             },
             "lid_close_time": {

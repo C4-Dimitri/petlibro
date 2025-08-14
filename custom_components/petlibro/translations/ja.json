@@ -209,7 +209,7 @@
             "sound_level": {
                 "name": "ボリュームレベル"
             },
-            "desiccant_cycle": {
+            "desiccant_frequency": {
                 "name": "乾燥剤周波数"
             },
             "lid_close_time": {
