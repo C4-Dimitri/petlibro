@@ -201,6 +201,42 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
         ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="sound_on",
+            translation_key="sound_on",
+            set_fn=lambda device: device.set_sound_on(),
+            name="Turn On Sound"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="sound_off",
+            translation_key="sound_off",
+            set_fn=lambda device: device.set_sound_off(),
+            name="Turn Off Sound"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Light"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Light"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="sleep_on",
+            translation_key="sleep_on",
+            set_fn=lambda device: device.set_sleep_on(),
+            name="Turn On Sleep Mode"
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="sleep_off",
+            translation_key="sleep_off",
+            set_fn=lambda device: device.set_sleep_off(),
+            name="Turn Off Sleep Mode"
+        ),
     ],
     DockstreamSmartFountain: [
     ],

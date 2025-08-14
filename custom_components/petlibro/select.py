@@ -32,6 +32,7 @@ from .devices.feeders.granary_smart_feeder import GranarySmartFeeder
 from .devices.feeders.granary_smart_camera_feeder import GranarySmartCameraFeeder
 from .devices.feeders.one_rfid_smart_feeder import OneRFIDSmartFeeder
 from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
+from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
@@ -103,12 +104,28 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
+            },
+            "vacuum_mode": {
+                "Study": "LEARNING",
+                "Normal": "NORMAL",
+                "Manual": "MANUAL"
             }
         }
         return mappings.get(key, {}).get(current_selection, "unknown")
 
 DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     Feeder: [
+    ],
+    SpaceSmartFeeder: [
+        PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
+            key="vacuum_mode",
+            translation_key="vacuum_mode",
+            icon="mdi:air-purifier",
+            current_selection=lambda device: device.vacuum_mode,
+            method=lambda device, current_selection: device.set_vacuum_mode(PetLibroSelectEntity.map_value_to_api(key="vacuum_mode", current_selection=current_selection)),
+            options_list=['Study','Normal','Manual'],
+            name="Vacuum Mode"
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroSelectEntityDescription[OneRFIDSmartFeeder](

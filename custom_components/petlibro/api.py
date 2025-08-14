@@ -346,6 +346,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
 
+    async def get_device_events(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_events")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping deviceEvents request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_events", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/data/event/deviceEventsV2", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_events"] = now
+            self._cached_responses[f"{device_id}_events"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching deviceEvents for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching deviceEvents for device {device_id}: {e}")
+
     async def get_default_matrix(self, device_sn: str) -> dict:
         """
         Fetch the default matrix for a device using a GET request.
@@ -408,6 +433,9 @@ class PetLibroAPI:
 
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
+
+    async def device_events(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/data/event/deviceEventsV2", serial)
 
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)
@@ -515,7 +543,7 @@ class PetLibroAPI:
 
     async def set_lid_close_time(self, serial: str, value: float):
         """Set the lid close time."""
-        _LOGGER.debug(f"Setting sound level: serial={serial}, value={value}")
+        _LOGGER.debug(f"Setting lid close time: serial={serial}, value={value}")
         try:
             response = await self.session.post("/device/setting/updateCoverSetting", json={
                 "deviceSn": serial,
@@ -544,6 +572,26 @@ class PetLibroAPI:
             return response
         except Exception as e:
             _LOGGER.error(f"Failed to set lid speed for device {serial}: {e}")
+            raise
+
+    async def set_vacuum_mode(self, serial: str, value: str):
+        """Set the vacuum mode."""
+        _LOGGER.debug(f"Setting vacuum mode: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/vacuum", json={
+                "deviceSn": serial,
+                "vacuumMode": value,
+                "requestId": request_id
+            })
+
+            # Check if response is already parsed (since response is an integer here)\
+            _LOGGER.debug(f"Vacuum mode successful, returned code: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
             raise
 
     async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
@@ -829,6 +877,44 @@ class PetLibroAPI:
             "soundAgingType": 1,
             "soundStartTime": None,
             "soundEndTime": None
+        })
+
+    async def set_light_on(self, serial: str):
+        """Trigger turn light on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": True,
+            "lightAgingType": 1,
+            "soundStartTime": None,
+            "soundEndTime": None
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn light off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightSwitch": False,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None
+        })
+
+    async def set_sleep_on(self, serial: str):
+        """Trigger turn sleep mode on"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": True,
+            "sleepEndTime": None,
+            "sleepStartTime": None
+        })
+    
+    async def set_sleep_off(self, serial: str):
+        """Trigger turn sleep mode off"""
+        await self.session.post("/device/setting/updateSleepModeSetting", json={
+            "deviceSn": serial,
+            "enableSleepMode": False,
+            "sleepEndTime": None,
+            "sleepStartTime": None
         })
 
     async def set_reposition_schedule(self, serial: str, plan: dict, template_name: str):
