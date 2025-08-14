@@ -20,6 +20,7 @@ class PolarWetFoodFeeder(Device):
             # Fetch specific data for this device
             grain_status = await self.api.device_grain_status(self.serial)
             real_info = await self.api.device_real_info(self.serial)
+            attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             wet_feeding_plan = await self.api.device_wet_feeding_plan(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
@@ -28,6 +29,7 @@ class PolarWetFoodFeeder(Device):
             self.update_data({
                 "grainStatus": grain_status or {},
                 "realInfo": real_info or {},
+                "getAttributeSetting": attribute_settings or {},
                 "getUpgrade": get_upgrade or {},
                 "wetFeedingPlan": wet_feeding_plan or {},
                 "getfeedingplantoday": get_feeding_plan_today or {}
@@ -152,7 +154,7 @@ class PolarWetFoodFeeder(Device):
 
     @property
     def whether_in_sleep_mode(self) -> bool:
-        return bool(self._data.get("realInfo", {}).get("whetherInSleepMode", False))
+        return bool(self._data.get("getAttributeSetting", {}).get("enableSleepMode", False))
 
     @property
     def enable_low_battery_notice(self) -> bool:

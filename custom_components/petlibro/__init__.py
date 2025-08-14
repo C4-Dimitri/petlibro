@@ -25,8 +25,13 @@ _LOGGER = logging.getLogger(__name__)
 # Define the platforms for each device type
 PLATFORMS_BY_TYPE = {
     Feeder: (
+        Platform.SENSOR,
+        Platform.BINARY_SENSOR,
         Platform.SWITCH,
         Platform.BUTTON,
+        Platform.NUMBER,
+        Platform.SELECT,
+        Platform.TEXT,
     ),
     AirSmartFeeder: (
         Platform.SENSOR,

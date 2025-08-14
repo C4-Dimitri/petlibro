@@ -184,6 +184,18 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method = lambda device, value: device.set_manual_feed_quantity(value),
             name = "Manual Feed Quantity"
         ),
+        PetLibroNumberEntityDescription[SpaceSmartFeeder](
+            key="sound_level",
+            translation_key="sound_level",
+            icon="mdi:volume-high",
+            native_unit_of_measurement="%",
+            native_max_value=100,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.sound_level,
+            method=lambda device, value: device.set_sound_level(value),
+            name="Sound Level"
+        ),
     ],
     DockstreamSmartFountain: [
         PetLibroNumberEntityDescription[DockstreamSmartFountain](
