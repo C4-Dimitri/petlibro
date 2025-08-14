@@ -299,6 +299,18 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
     DockstreamSmartRFIDFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
@@ -313,20 +325,6 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
-        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
-            key="cleaning_reset",
-            translation_key="cleaning_reset",
-            set_fn=lambda device: device.set_cleaning_reset(),
-            name="Cleaning Reset"
-        ),
-        PetLibroButtonEntityDescription[DockstreamSmartFountain](
-            key="filter_reset",
-            translation_key="filter_reset",
-            set_fn=lambda device: device.set_filter_reset(),
-            name="Filter Reset"
-        )
-    ],
-    DockstreamSmartRFIDFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
             key="cleaning_reset",
             translation_key="cleaning_reset",
