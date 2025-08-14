@@ -132,7 +132,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
     Feeder: [
     ],
     SpaceSmartFeeder: [
-        PetLibroSelectEntityDescription[OneRFIDSmartFeeder](
+        PetLibroSelectEntityDescription[SpaceSmartFeeder](
             key="vacuum_mode",
             translation_key="vacuum_mode",
             icon="mdi:air-purifier",
