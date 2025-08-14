@@ -755,7 +755,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
-    async def set_manual_feed_now(self, serial: str):
+    async def set_manual_feed_now(self, serial: str, plate: int):
         """Trigger manual feed now for a specific device. This opens the food bowl door."""
         _LOGGER.debug(f"Triggering manual feed now for device with serial: {serial}")
         
@@ -763,9 +763,7 @@ class PetLibroAPI:
             # Send the POST request to trigger manual feeding
             await self.session.post("/device/wetFeedingPlan/manualFeedNow", json={
                 "deviceSn": serial,
-                # The plate ID doesn't matter here - the device will always feed from the current bowl regardless of what the plate ID is.
-                # The app also always uses 1 for the plate ID.
-                "plate": 1 
+                "plate": plate 
             })
 
         except aiohttp.ClientError as err:
