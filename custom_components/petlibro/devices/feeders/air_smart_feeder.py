@@ -185,7 +185,7 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
 
         if not raw or not isinstance(raw, list):
             return None
-
+        
         for day_entry in raw:
             work_records = day_entry.get("workRecords", [])
             for record in work_records:
@@ -196,7 +196,6 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
                         dt = datetime.fromtimestamp(timestamp_ms / 1000)
                         _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
                         return dt.strftime("%Y-%m-%d %H:%M:%S")
-
         return None
 
     @property
@@ -293,3 +292,22 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
             _LOGGER.error(f"Failed to trigger manual feed for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feed: {err}")
             
+    # Method for indicator turn on
+    async def set_light_on(self) -> None:
+        _LOGGER.debug(f"Turning on the indicator for {self.serial}")
+        try:
+            await self.api.set_light_on(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn on the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning on the indicator: {err}")
+
+    # Method for indicator turn off
+    async def set_light_off(self) -> None:
+        _LOGGER.debug(f"Turning off the indicator for {self.serial}")
+        try:
+            await self.api.set_light_off(self.serial)
+            await self.refresh()  # Refresh the state after the action
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to turn off the indicator for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error turning off the indicator: {err}")
