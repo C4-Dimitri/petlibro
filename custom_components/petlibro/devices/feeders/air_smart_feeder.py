@@ -177,8 +177,8 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
         return cast(float, self._data.get("remainingDesiccantDays", 0))
 
     @property
-    def last_feed_time(self) -> str | None:
-        """Return the recordTime of the last successful grain output as a formatted string."""
+    def last_feed_time(self) -> datetime | None:
+        """Return the recordTime of the last successful grain output as a datetime object."""
         _LOGGER.debug("last_feed_time called for device: %s", self.serial)
         raw = self._data.get("workRecord", [])
 
@@ -195,10 +195,10 @@ class AirSmartFeeder(Device):  # Inherit directly from Device
                 if record.get("type") == "GRAIN_OUTPUT_SUCCESS":
                     timestamp_ms = record.get("recordTime", 0)
                     if timestamp_ms:
-                        dt = datetime.fromtimestamp(timestamp_ms / 1000)
-                        _LOGGER.debug("Returning formatted time: %s", dt.strftime("%Y-%m-%d %H:%M:%S"))
-                        return dt.strftime("%Y-%m-%d %H:%M:%S")
-
+                        # Convert to timezone-aware UTC datetime
+                        dt = datetime.fromtimestamp(timestamp_ms / 1000, tz=timezone.utc)
+                        _LOGGER.debug("Returning datetime object: %s", dt.isoformat())
+                        return dt
         return None
 
     @property
