@@ -64,7 +64,19 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
-        )
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroButtonEntityDescription[GranarySmartFeeder](
@@ -84,7 +96,19 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
-        )
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
@@ -104,7 +128,19 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
             name="Disable Feeding Plan"
-        )
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -159,7 +195,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="desiccant_reset",
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),
-            name="Desiccant Replaced"
+            name="Desiccant Reset"
         )
     ],
     PolarWetFoodFeeder: [
@@ -180,7 +216,19 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="reposition_schedule",
             set_fn=lambda device: device.reposition_schedule(),
             name="Reposition the schedule"
-        )
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[PolarWetFoodFeeder](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
     ],
     SpaceSmartFeeder: [
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
@@ -217,13 +265,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="light_on",
             translation_key="light_on",
             set_fn=lambda device: device.set_light_on(),
-            name="Turn On Light"
+            name="Turn On Indicator"
         ),
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
             key="light_off",
             translation_key="light_off",
             set_fn=lambda device: device.set_light_off(),
-            name="Turn Off Light"
+            name="Turn Off Indicator"
         ),
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
             key="sleep_on",
@@ -239,8 +287,58 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
         ),
     ],
     DockstreamSmartFountain: [
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
     ],
     DockstreamSmartRFIDFountain: [
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="light_on",
+            translation_key="light_on",
+            set_fn=lambda device: device.set_light_on(),
+            name="Turn On Indicator"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="light_off",
+            translation_key="light_off",
+            set_fn=lambda device: device.set_light_off(),
+            name="Turn Off Indicator"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
+    ],
+    DockstreamSmartRFIDFountain: [
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="cleaning_reset",
+            translation_key="cleaning_reset",
+            set_fn=lambda device: device.set_cleaning_reset(),
+            name="Cleaning Reset"
+        ),
+        PetLibroButtonEntityDescription[DockstreamSmartRFIDFountain](
+            key="filter_reset",
+            translation_key="filter_reset",
+            set_fn=lambda device: device.set_filter_reset(),
+            name="Filter Reset"
+        )
     ],
 }
 

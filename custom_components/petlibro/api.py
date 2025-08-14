@@ -4,6 +4,7 @@
 # https://api.us.petlibro.com/device/device/baseInfo
 # https://api.us.petlibro.com/device/device/realInfo
 # https://api.us.petlibro.com/device/setting/getAttributeSetting
+# https://api.us.petlibro.com/device/ota/getUpgrade
 # https://api.us.petlibro.com/device/data/grainStatus
 
 from logging import getLogger
@@ -284,6 +285,31 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching getAttributeSetting for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching getAttributeSetting for device {device_id}: {e}")
 
+    async def get_device_upgrade(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_getUpgrade")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping getUpgrade request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_getUpgrade", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/device/ota/getUpgrade", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_getUpgrade"] = now
+            self._cached_responses[f"{device_id}_getUpgrade"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching getUpgrade for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching getUpgrade for device {device_id}: {e}")
+
     async def get_device_base_info(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
         now = datetime.utcnow()
@@ -345,6 +371,31 @@ class PetLibroAPI:
         except Exception as e:
             _LOGGER.error(f"Error fetching workRecord for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching workRecord for device {device_id}: {e}")
+
+    async def get_device_events(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_events")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping deviceEvents request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_events", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/data/event/deviceEventsV2", json={
+                "id": device_id,
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_events"] = now
+            self._cached_responses[f"{device_id}_events"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching deviceEvents for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching deviceEvents for device {device_id}: {e}")
 
     async def get_default_matrix(self, device_sn: str) -> dict:
         """
@@ -409,6 +460,12 @@ class PetLibroAPI:
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
 
+    async def device_events(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/data/event/deviceEventsV2", serial)
+
+    async def device_upgrade(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/device/ota/getUpgrade", serial)
+
     async def device_grain_status(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/data/grainStatus", serial)
 
@@ -471,25 +528,25 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set sound enable for device {serial}: {err}")
             raise PetLibroAPIError(f"Error setting sound enable: {err}")
 
-    async def set_desiccant_frequency(self, serial: str, value: float) -> JSON:
-        """Set the desiccant frequency."""
-        _LOGGER.debug(f"Setting desiccant frequency: serial={serial}, value={value}")
+    async def set_desiccant_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the desiccant cycle."""
+        _LOGGER.debug(f"Setting desiccant cycle: serial={serial}, value={value}, key={key}")
         try:
             # Generate a dynamic request ID for the manual feeding
             request_id = str(uuid.uuid4()).replace("-", "")
 
             response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
                     "deviceSn": serial,
-                    "key": "DESICCANT",  # Try and find a way to make this dynamic as different devices may have a different key. if too difficult we could just duplicate this block for each key type.
+                    "key": key,
                     "frequency": value,
                     "requestId": request_id,
                     "timeout": 5000
                 },
             )
-            _LOGGER.debug(f"Desiccant frequency set successfully: {response}")
+            _LOGGER.debug(f"Desiccant cycle set successfully: {response}")
             return response
         except Exception as e:
-            _LOGGER.error(f"Failed to set desiccant frequency for device {serial}: {e}")
+            _LOGGER.error(f"Failed to set desiccant cycle for device {serial}: {e}")
             raise
 
     async def set_sound_switch(self, serial: str, enable: bool):
@@ -604,6 +661,48 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
+    async def set_cleaning_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the machine cleaning cycle."""
+        _LOGGER.debug(f"Setting machine cleaning cycle: serial={serial}, value={value}, key={key}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                    "deviceSn": serial,
+                    "key": key,
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000
+                },
+            )
+            _LOGGER.debug(f"Machine cleaning cycle set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set machine cleaning cycle for device {serial}: {e}")
+            raise
+
+    async def set_filter_cycle(self, serial: str, value: float, key: str) -> JSON:
+        """Set the filter cycle."""
+        _LOGGER.debug(f"Setting filter cycle: serial={serial}, value={value}, key={key}")
+        try:
+            # Generate a dynamic request ID for the manual feeding
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            response = await self.session.post("/device/device/maintenanceFrequencySetting", json={
+                    "deviceSn": serial,
+                    "key": key,
+                    "frequency": value,
+                    "requestId": request_id,
+                    "timeout": 5000
+                },
+            )
+            _LOGGER.debug(f"Filter cycle set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set filter cycle for device {serial}: {e}")
+            raise
+
     async def set_lid_mode(self, serial: str, value: str):
         """Set the lid mode."""
         _LOGGER.debug(f"Setting lid mode: serial={serial}, value={value}")
@@ -704,7 +803,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to trigger manual feeding for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering manual feeding: {err}")
 
-    async def set_manual_feed_now(self, serial: str):
+    async def set_manual_feed_now(self, serial: str, plate: int):
         """Trigger manual feed now for a specific device. This opens the food bowl door."""
         _LOGGER.debug(f"Triggering manual feed now for device with serial: {serial}")
         
@@ -712,9 +811,7 @@ class PetLibroAPI:
             # Send the POST request to trigger manual feeding
             await self.session.post("/device/wetFeedingPlan/manualFeedNow", json={
                 "deviceSn": serial,
-                # The plate ID doesn't matter here - the device will always feed from the current bowl regardless of what the plate ID is.
-                # The app also always uses 1 for the plate ID.
-                "plate": 1 
+                "plate": plate 
             })
 
         except aiohttp.ClientError as err:
@@ -774,10 +871,10 @@ class PetLibroAPI:
         _LOGGER.debug(f"Triggering desiccant reset for device with serial: {serial}")
         
         try:
-            # Generate a dynamic request ID for the manual feeding
+            # Generate a dynamic request ID for the desiccant reset
             request_id = str(uuid.uuid4()).replace("-", "")
 
-            # Send the POST request to trigger manual feeding
+            # Send the POST request to trigger desiccant reset
             response = await self.session.post("/device/device/desiccantReset", json={
                 "deviceSn": serial,
                 "requestId": request_id,  # Use dynamic request ID
@@ -802,6 +899,89 @@ class PetLibroAPI:
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger desiccant reset for device {serial}: {err}")
             raise PetLibroAPIError(f"Error triggering desiccant reset: {err}")
+
+
+    async def trigger_firmware_upgrade(self, serial: str, job_item_id: str):
+        """Trigger the firmware upgrade for the device."""
+        _LOGGER.debug(f"Triggering firmware upgrade: serial={serial}, jobItemId={job_item_id}")
+        try:
+            response = await self.session.post("/device/ota/doUpgrade", json={
+                "deviceSn": serial,
+                "jobItemId": job_item_id
+            })
+            _LOGGER.debug(f"Firmware upgrade triggered successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to trigger firmware upgrade for device {serial}: {e}")
+            raise
+
+    async def set_cleaning_reset(self, serial: str) -> JSON:
+        """Trigger machine cleaning reset for a specific device."""
+        _LOGGER.debug(f"Triggering machine cleaning reset for device with serial: {serial}")
+        
+        try:
+            # Generate a dynamic request ID for the machine cleaning reset
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            # Send the POST request to trigger machine cleaning reset
+            response = await self.session.post("/device/device/machineCleaningReset", json={
+                "deviceSn": serial,
+                "requestId": request_id,  # Use dynamic request ID
+                "timeout": 5000
+            })
+
+            # Check if response is already parsed (since response is an integer here)
+            if isinstance(response, int):
+                _LOGGER.debug(f"Machine cleaning reset set successfully, returned code: {response}")
+                return response
+            
+            # If response is a dictionary (JSON), handle it
+            response_data = await response.json()
+            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
+            
+            # Check if the response indicates success
+            if response.status != 200 or response_data.get("code") != 0:
+                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
+
+            return response_data
+
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
+
+    async def set_filter_reset(self, serial: str) -> JSON:
+        """Trigger machine cleaning reset for a specific device."""
+        _LOGGER.debug(f"Triggering filter reset for device with serial: {serial}")
+        
+        try:
+            # Generate a dynamic request ID for the machine cleaning reset
+            request_id = str(uuid.uuid4()).replace("-", "")
+
+            # Send the POST request to trigger machine cleaning reset
+            response = await self.session.post("/device/device/filterReset", json={
+                "deviceSn": serial,
+                "requestId": request_id,  # Use dynamic request ID
+                "timeout": 5000
+            })
+
+            # Check if response is already parsed (since response is an integer here)
+            if isinstance(response, int):
+                _LOGGER.debug(f"Filter reset set successfully, returned code: {response}")
+                return response
+            
+            # If response is a dictionary (JSON), handle it
+            response_data = await response.json()
+            _LOGGER.debug(f"Machine cleaning reset response data: {response_data}")
+            
+            # Check if the response indicates success
+            if response.status != 200 or response_data.get("code") != 0:
+                raise PetLibroAPIError(f"Failed to trigger machine cleaning reset: {response_data.get('msg')}")
+
+            return response_data
+
+        except aiohttp.ClientError as err:
+            _LOGGER.error(f"Failed to trigger machine cleaning reset for device {serial}: {err}")
+            raise PetLibroAPIError(f"Error triggering machine cleaning reset: {err}")
 
     async def set_manual_lid_open(self, serial: str):
         """Trigger manual lid opening for a specific device."""
@@ -829,6 +1009,26 @@ class PetLibroAPI:
             "screenDisplayStartTime": None,
             "screenDisplayEndTime": None,
             "screenDisplaySwitch": False
+        })
+
+    async def set_light_on(self, serial: str):
+        """Trigger turn indicator on"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": True
+        })
+    
+    async def set_light_off(self, serial: str):
+        """Trigger turn indicator off"""
+        await self.session.post("/device/setting/updateLightingSetting", json={
+            "deviceSn": serial,
+            "lightAgingType": 1,
+            "lightingStartTime": None,
+            "lightingEndTime": None,
+            "lightSwitch": False
         })
 
     async def set_sound_on(self, serial: str):

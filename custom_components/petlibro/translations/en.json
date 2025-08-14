@@ -63,6 +63,9 @@
             "last_feed_time": {
                 "name": "Last Feed Time"
             },
+            "last_feed_quantity": {
+                "name": "Last Feed Quantity"
+            },
             "feeding_plan_state": {
                 "name": "Today's Feeding Plan"
             },
@@ -118,7 +121,7 @@
                 "name": "Temperature"
             },
             "plate_position": {
-                "name": "Plate position"
+                "name": "Plate Position"
             },
             "display_selection": {
                 "name": "Display Value"
@@ -182,16 +185,29 @@
                 "name": "Turn Off Sleep Mode"
             },
             "desiccant_reset": {
-                "name": "Desiccant Replaced"
+                "name": "Desiccant Reset"
             },
             "ring_bell": {
                 "name": "Ring Bell"
             },
+
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
             },
             "reposition_schedule": {
                 "name": "Reposition Schedule"
+            },
+            "light_on": {
+                "name": "Turn On Indicator"
+            },
+            "light_off": {
+                "name": "Turn Off Indicator"
+            },
+            "cleaning_reset": {
+                "name": "Cleaning Reset"
+            },
+            "filter_reset": {
+                "name": "Filter Reset"
             }
         },
         "binary_sensor": {
@@ -200,6 +216,12 @@
             },
             "food_dispenser_state": {
                 "name": "Food Dispenser"
+            },
+            "food_outlet_state": {
+                "name": "Food Outlet"
+            },
+            "vacuum_state": {
+                "name": "Vacuum State"
             },
             "door_blocked": {
                 "name": "Lid Status"
@@ -224,14 +246,17 @@
             },
             "display_switch": {
                 "name": "Display Status"
+            },
+            "light": {
+                "name": "Indicator"
             }
         },
         "number": {
             "sound_level": {
                 "name": "Volume Level"
             },
-            "desiccant_frequency": {
-                "name": "Desiccant Frequency"
+            "desiccant_cycle": {
+                "name": "Desiccant Cycle"
             },
             "lid_close_time": {
                 "name": "Lid Close Time"
@@ -241,6 +266,12 @@
             },
             "water_dispensing_duration": {
                 "name": "Water Dispensing Duration"
+            },
+            "cleaning_cycle": {
+                "name": "Cleanining Cycle"
+            },
+            "filter_cycle": {
+                "name": "Filter Cycle"
             }
         },
         "select": {
@@ -255,11 +286,19 @@
             },
             "water_dispensing_mode": {
                 "name": "Water Dispensing Mode"
+            },
+            "plate_position": {
+                "name": "Plate Position"
             }
         },
         "text": {
             "display_text": {
                 "name": "Text on Display"
+            }
+        },
+        "update": {
+            "firmware": {
+                "name": "Update"
             }
         }
     }
