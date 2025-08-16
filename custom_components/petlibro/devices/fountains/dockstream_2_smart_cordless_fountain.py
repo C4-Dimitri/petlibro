@@ -142,31 +142,42 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("realInfo", {}).get("waterStopSwitch", False)
 
     @property
-    def water_dispensing_mode(self) -> int:
-        """Return the user-friendly water dispensing mode (mapped directly from the API value)."""
-        api_value = self._data.get("realInfo", {}).get("useWaterType", 0)
-        detection_sensitivity = self._data.get("realInfo", {}).get("radarSensingLevel", "unknown")
-        water_switch = self._data.get("realInfo", {}).get("waterStopSwitch", False)
-        
-        # Direct mapping inside the property
-        if water_switch == True:
+    def water_dispensing_mode(self) -> str:
+        """Return the label used by the select (must match options_list)."""
+        real = self._data.get("realInfo", {}) or {}
+        api_value = real.get("useWaterType", 0)
+        radar = real.get("radarSensingLevel", "unknown")
+        water_switch = real.get("waterStopSwitch", False)
+
+        # Off overrides everything
+        if water_switch is True:
             return "Off"
+
+        if api_value == 0:
+            return "Flowing Water (Constant)"
+        elif api_value == 2:
+            if radar == "NearTrigger":
+                return "Sensor-Activated (Near)"
+            if radar == "FarTrigger":
+                return "Sensor-Activated (Far)"
+            # Fallback if the device hasn't updated radar yet
+            return getattr(self, "_last_sensor_label", "Sensor-Activated (Near)")
         else:
-            if api_value == 0:
-                return "Flowing Water (Constant)"
-            elif api_value == 2:
-                if detection_sensitivity == "NearTrigger":
-                    return "Sensor-Activated Flow (Near)"
-                elif detection_sensitivity == "FarTrigger":
-                    return "Sensor-Activated Flow (Far)"
-                else:
-                    return "Unknown"
-            else:
-                return "Unknown"
+            return getattr(self, "_last_sensor_label", "Flowing Water (Constant)")
 
     async def set_water_dispensing_mode(self, value: int) -> None:
         _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
         try:
+            # Cache last explicit selection for UI stability during API lag
+            if value == 997:
+                self._last_sensor_label = "Sensor-Activated (Near)"
+            elif value == 998:
+                self._last_sensor_label = "Sensor-Activated (Far)"
+            elif value == 999:
+                self._last_sensor_label = "Off"
+            elif value == 0:
+                self._last_sensor_label = "Flowing Water (Constant)"
+
             await self.api.set_water_dispensing_mode(self.serial, value)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:

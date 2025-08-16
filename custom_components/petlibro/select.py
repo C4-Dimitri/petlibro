@@ -115,8 +115,8 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
-                "Sensor-Activated Flow (Near)": 997, # Value for capturing in the method so we can handle a different action for near vs far vs off.
-                "Sensor-Activated Flow (Far)": 998,
+                "Sensor-Activated (Near)": 997, # Value for capturing in the method so we can handle a different action for near vs far vs off.
+                "Sensor-Activated (Far)": 998,
                 "Off": 999
             },
             "vacuum_mode": {
@@ -204,7 +204,7 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
             method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
-            options_list=['Flowing Water (Constant)','Sensor-Activated Flow (Near)','Sensor-Activated Flow (Far)','Off'],
+            options_list=['Flowing Water (Constant)','Sensor-Activated (Near)','Sensor-Activated (Far)','Off'],
             name="Water Dispensing Mode"
         ),
     ],
