@@ -175,13 +175,13 @@ class Dockstream2SmartCordlessFountain(Device):
         try:
             # Cache last explicit selection for UI stability during API lag
             if value == 999:
-                self._last_sensor_label = "Off"
+                self._last_water_mode_label  = "Off"
             elif value == 998:
-                self._last_sensor_label = "Sensor-Activated (Far)"
+                self._last_water_mode_label  = "Sensor-Activated (Far)"
             elif value == 997:
-                self._last_sensor_label = "Sensor-Activated (Near)"
+                self._last_water_mode_label  = "Sensor-Activated (Near)"
             elif value == 0:
-                self._last_sensor_label = "Flowing Water (Constant)"
+                self._last_water_mode_label  = "Flowing Water (Constant)"
 
             await self.api.set_water_dispensing_mode(self.serial, value)
             await self.refresh()  # Refresh the state after the action
