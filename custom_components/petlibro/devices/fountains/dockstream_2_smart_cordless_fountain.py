@@ -147,34 +147,39 @@ class Dockstream2SmartCordlessFountain(Device):
         real = self._data.get("realInfo", {}) or {}
         api_value = real.get("useWaterType", 0)
         radar = real.get("radarSensingLevel", "unknown")
-        water_switch = real.get("waterStopSwitch", False)
+        stop = real.get("waterStopSwitch", False)
 
-        # Off overrides everything
-        if water_switch is True:
+        # OFF overrides everything else
+        if stop is True:
+            self._last_water_mode_label = "Off"
             return "Off"
 
         if api_value == 0:
+            self._last_water_mode_label = "Flowing Water (Constant)"
             return "Flowing Water (Constant)"
         elif api_value == 2:
             if radar == "NearTrigger":
+                self._last_water_mode_label = "Sensor-Activated (Near)"
                 return "Sensor-Activated (Near)"
             if radar == "FarTrigger":
+                self._last_water_mode_label = "Sensor-Activated (Far)"
                 return "Sensor-Activated (Far)"
-            # Fallback if the device hasn't updated radar yet
-            return getattr(self, "_last_sensor_label", "Sensor-Activated (Near)")
-        else:
-            return getattr(self, "_last_sensor_label", "Flowing Water (Constant)")
+            # Fallback while radar update method is catching up
+            return getattr(self, "_last_water_mode_label", "Flowing Water (Constant)")
+
+        # Fallback if unknown value returned from API, or while data is in process of being fetched.
+        return getattr(self, "_last_water_mode_label", "Flowing Water (Constant)")
 
     async def set_water_dispensing_mode(self, value: int) -> None:
         _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
         try:
             # Cache last explicit selection for UI stability during API lag
-            if value == 997:
-                self._last_sensor_label = "Sensor-Activated (Near)"
+            if value == 999:
+                self._last_sensor_label = "Off"
             elif value == 998:
                 self._last_sensor_label = "Sensor-Activated (Far)"
-            elif value == 999:
-                self._last_sensor_label = "Off"
+            elif value == 997:
+                self._last_sensor_label = "Sensor-Activated (Near)"
             elif value == 0:
                 self._last_sensor_label = "Flowing Water (Constant)"
 

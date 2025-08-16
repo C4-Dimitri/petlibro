@@ -743,17 +743,25 @@ class PetLibroAPI:
         """Set the water dispensing mode."""
         _LOGGER.debug(f"Setting water dispensing mode: serial={serial}, value={value}")
         try:
-            # Turn water dispensing off entirely
+            # Turn water dispensing off entirely.
             if value == 999:
                 response = await self.session.post("/device/device/waterModeSetting", json={
                     "deviceSn": serial,
-                    "waterStopSwitch": True,  # true = off
+                    "waterStopSwitch": True,  # True = off
                 },)
                 _LOGGER.debug(f"Setting water dispensing mode to OFF successfully: {response}")
                 return response
 
             # Sensor-activated with distance refinement: update radar first, then set mode=2
             if value in (997, 998):
+                
+                # Turn water dispensing back on, in case it is currently off.
+                response = await self.session.post("/device/device/waterModeSetting", json={
+                    "deviceSn": serial,
+                    "waterStopSwitch": False,  # False = on
+                },)
+                _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
+
                 radar_response = await self.session.post("/device/setting/updateRadarSetting", json={
                     "deviceSn": serial,
                     "radarSensingLevel": "NearTrigger" if value == 997 else "FarTrigger",
