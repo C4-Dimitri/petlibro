@@ -661,6 +661,26 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
+    async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
+        """Set the water sensing delay."""
+        _LOGGER.debug(f"Setting water sensing delay duration: serial={serial}, value={value}")
+        try:
+            # Generate a dynamic request ID for the mode switch.
+            request_id = str(uuid.uuid4()).replace("-", "")
+            response = await self.session.post("/device/device/waterModeSetting", json={
+                "deviceSn": serial,
+                "requestId": request_id,
+                "useWaterType": current_mode,
+                "useWaterInterval": None,
+                "useWaterDuration": None,
+                "sensingWaterDuration": value
+            })
+            _LOGGER.debug(f"Water sensing delay set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water sensing delay for device {serial}: {e}")
+            raise
+
     async def set_cleaning_cycle(self, serial: str, value: float, key: str) -> JSON:
         """Set the machine cleaning cycle."""
         _LOGGER.debug(f"Setting machine cleaning cycle: serial={serial}, value={value}, key={key}")
@@ -723,17 +743,55 @@ class PetLibroAPI:
         """Set the water dispensing mode."""
         _LOGGER.debug(f"Setting water dispensing mode: serial={serial}, value={value}")
         try:
-            # Generate a dynamic request ID for the mode switch.
-            request_id = str(uuid.uuid4()).replace("-", "")
-            response = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "requestId": request_id,
-                "useWaterType": value,
-                "useWaterInterval": None,
-                "useWaterDuration": None
-            })
-            _LOGGER.debug(f"Water dispensing mode set successfully: {response}")
-            return response
+            # Turn water dispensing off entirely
+            if value == 999:
+                response = await self.session.post("/device/device/waterModeSetting", json={
+                    "deviceSn": serial,
+                    "waterStopSwitch": True,  # true = off
+                },)
+                _LOGGER.debug(f"Setting water dispensing mode to OFF successfully: {response}")
+                return response
+
+            # Sensor-activated with distance refinement: update radar first, then set mode=2
+            if value in (997, 998):
+                radar_response = await self.session.post("/device/setting/updateRadarSetting", json={
+                    "deviceSn": serial,
+                    "radarSensingLevel": "NearTrigger" if value == 997 else "FarTrigger",
+                },)
+                _LOGGER.debug(f"Radar setting updated successfully: {radar_response}")
+
+                request_id = str(uuid.uuid4()).replace("-", "")
+                mode_response = await self.session.post("/device/device/waterModeSetting", json={
+                    "deviceSn": serial,
+                    "requestId": request_id,
+                    "useWaterType": 2,           # normalize 997/998 to 2
+                    "useWaterInterval": None,
+                    "useWaterDuration": None,
+                    "sensingWaterDuration": 45
+                },)
+                _LOGGER.debug(f"Mode set successfully after radar: {mode_response}")
+                return mode_response  # keep return type consistent (final mode call)
+
+            # Normal modes: only 0 (constant) and 1 (scheduled)
+            if value in (0, 1):
+                request_id = str(uuid.uuid4()).replace("-", "")
+                response = await self.session.post("/device/device/waterModeSetting",json={
+                    "deviceSn": serial,
+                    "requestId": request_id,
+                    "useWaterType": value,
+                    "useWaterInterval": None,
+                    "useWaterDuration": None,
+                },)
+                _LOGGER.debug(f"Water dispensing mode set successfully: {response}")
+                return response
+
+            # Explicitly reject plain '2' and any unknown values
+            if value == 2:
+                raise ValueError(
+                    "useWaterType=2 must be set via 997 (Near) or 998 (Far) so radar is configured first."
+                )
+            raise ValueError(f"Unknown water dispensing value: {value}")
+
         except Exception as e:
             _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
             raise

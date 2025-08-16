@@ -35,6 +35,7 @@ from .devices.feeders.polar_wet_food_feeder import PolarWetFoodFeeder
 from .devices.feeders.space_smart_feeder import SpaceSmartFeeder
 from .devices.fountains.dockstream_smart_fountain import DockstreamSmartFountain
 from .devices.fountains.dockstream_smart_rfid_fountain import DockstreamSmartRFIDFountain
+from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2SmartCordlessFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
 @dataclass(frozen=True)
@@ -114,6 +115,9 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
+                "Sensor-Activated Flow (Near)": 997, # Value for capturing in the method so we can handle a different action for near vs far vs off.
+                "Sensor-Activated Flow (Far)": 998,
+                "Off": 999
             },
             "vacuum_mode": {
                 "Study": "LEARNING",
@@ -190,6 +194,17 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             current_selection=lambda device: device.water_dispensing_mode,
             method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
+            name="Water Dispensing Mode"
+        ),
+    ],
+    Dockstream2SmartCordlessFountain: [
+        PetLibroSelectEntityDescription[Dockstream2SmartCordlessFountain](
+            key="water_dispensing_mode",
+            translation_key="water_dispensing_mode",
+            icon="mdi:arrow-oscillating",
+            current_selection=lambda device: device.water_dispensing_mode,
+            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            options_list=['Flowing Water (Constant)','Sensor-Activated Flow (Near)','Sensor-Activated Flow (Far)','Off'],
             name="Water Dispensing Mode"
         ),
     ],
