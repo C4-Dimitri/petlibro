@@ -147,51 +147,37 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("realInfo", {}).get("waterStopSwitch", False)
 
     @property
-    def water_dispensing_mode(self) -> str | None:
-        """Return the label used by the select (must match options_list)."""
+    def water_dispensing_mode(self) -> str:
+        """Return a simple, user-facing label; 'Unknown' until data lands."""
         real = self._data.get("realInfo", {}) or {}
-
+        stop = real.get("waterStopSwitch")
         api_value = real.get("useWaterType")
         radar = real.get("radarSensingLevel")
-        stop = real.get("waterStopSwitch")
 
-        # OFF overrides everything else when explicitly True
+        # OFF overrides everything
         if stop is True:
-            self._last_water_mode_label = "Off"
             return "Off"
 
+        # Constant
         if api_value == 0:
-            self._last_water_mode_label = "Flowing Water (Constant)"
             return "Flowing Water (Constant)"
 
-        elif api_value == 2:
+        # Sensor-activated (Near/Far)
+        if api_value == 2:
             if radar == "NearTrigger":
-                self._last_water_mode_label = "Sensor-Activated (Near)"
                 return "Sensor-Activated (Near)"
             if radar == "FarTrigger":
-                self._last_water_mode_label = "Sensor-Activated (Far)"
                 return "Sensor-Activated (Far)"
-            # Radar not landed yet: don't assert a wrong value
-            return getattr(self, "_last_water_mode_label", None)
+            return "Unknown"  # waiting for radar to land
 
-        # Unknown/unsupported/missing useWaterType:
-        return getattr(self, "_last_water_mode_label", None)
+        # Value not present yet, or unsupported mode returned from API
+        return "Unknown"
 
     async def set_water_dispensing_mode(self, value: int) -> None:
         _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
         try:
-            # Cache last explicit selection for UI stability during API lag
-            if value == 999:
-                self._last_water_mode_label  = "Off"
-            elif value == 998:
-                self._last_water_mode_label  = "Sensor-Activated (Far)"
-            elif value == 997:
-                self._last_water_mode_label  = "Sensor-Activated (Near)"
-            elif value == 0:
-                self._last_water_mode_label  = "Flowing Water (Constant)"
-
             await self.api.set_water_dispensing_mode(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
+            await self.refresh()
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
