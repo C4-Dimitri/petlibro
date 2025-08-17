@@ -66,17 +66,19 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
 
     @property
     def current_option(self) -> str | None:
-        """Return the current option."""
-        # Prefer a custom callback if provided (lets us return 'Plate X')
+        # If we've set a current option explicitly and it's valid, prefer it
+        if hasattr(self, "_attr_current_option") and self._attr_current_option in self.options:
+            return self._attr_current_option
+
         if self.entity_description.current_selection is not None:
             try:
                 state = self.entity_description.current_selection(self.device)
+                # Only expose labels HA knows about
                 return state if state in self.options else None
             except Exception as e:
                 _LOGGER.error("current_selection callback failed for %s: %s", self.device.name, e)
                 return None
 
-        # Fallback to attribute lookup by key
         state = getattr(self.device, self.entity_description.key, None)
         if state is None:
             _LOGGER.warning("Current option '%s' is None for device %s", self.entity_description.key, self.device.name)
@@ -85,19 +87,15 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         return state if state in self.options else None
 
     async def async_select_option(self, current_selection: str) -> None:
-        """Set the current_option of the select."""
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
-            # Show mapped value for water_dispensing_mode
-            if self.entity_description.key == "water_dispensing_mode":
-                api_val = PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)
-                _LOGGER.debug("%s: mapping '%s' -> %s",self.device.name, current_selection, api_val)
-                if api_val == "unknown":
-                    _LOGGER.error("Mapping failed for '%s' on %s; aborting set.",current_selection, self.device.name)
-                    return
-
             _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
             await self.entity_description.method(self.device, current_selection)
+
+            # Immediately reflect the user's choice if it's a valid option
+            if current_selection in self.options:
+                self._attr_current_option = current_selection
+                self.async_write_ha_state()
 
             _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
         except Exception as e:

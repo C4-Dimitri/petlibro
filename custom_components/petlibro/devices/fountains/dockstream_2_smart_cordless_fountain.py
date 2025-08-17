@@ -193,19 +193,13 @@ class Dockstream2SmartCordlessFountain(Device):
                 desired = "Sensor-Activated (Far)"
 
             resolved = self.water_dispensing_mode
-            _LOGGER.debug(
-                "Post-set snapshot for %s: desired=%s, resolved=%s",
-                self.serial, desired, resolved
-            )
+            _LOGGER.debug("Post-set snapshot for %s: desired=%s, resolved=%s",self.serial, desired, resolved)
 
             # If radar/useWaterType hasn't fully landed yet, retry once after a short pause
             if desired and resolved != desired:
                 await asyncio.sleep(0.5)
                 await self.refresh()
-                _LOGGER.debug(
-                    "Post-set second refresh for %s: resolved=%s",
-                    self.serial, self.water_dispensing_mode
-                )
+                _LOGGER.debug("Post-set second refresh for %s: resolved=%s",self.serial, self.water_dispensing_mode)
 
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
