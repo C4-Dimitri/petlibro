@@ -782,6 +782,14 @@ class PetLibroAPI:
 
             # Normal modes: only 0 (constant) and 1 (scheduled)
             if value in (0, 1):
+
+                # Turn water dispensing back on, in case it is currently off.
+                response = await self.session.post("/device/device/waterModeSetting", json={
+                    "deviceSn": serial,
+                    "waterStopSwitch": False,  # False = on
+                },)
+                _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
+
                 request_id = str(uuid.uuid4()).replace("-", "")
                 response = await self.session.post("/device/device/waterModeSetting",json={
                     "deviceSn": serial,
@@ -795,9 +803,7 @@ class PetLibroAPI:
 
             # Explicitly reject plain '2' and any unknown values
             if value == 2:
-                raise ValueError(
-                    "useWaterType=2 must be set via 997 (Near) or 998 (Far) so radar is configured first."
-                )
+                raise ValueError("useWaterType=2 must be set via 997 (Near) or 998 (Far) so radar is configured first.")
             raise ValueError(f"Unknown water dispensing value: {value}")
 
         except Exception as e:

@@ -130,7 +130,12 @@ class Dockstream2SmartCordlessFountain(Device):
         """Enable or disable the sound."""
         await self.api.set_sound_switch(self.serial, value)
         await self.refresh()
-    
+
+    @property
+    def today_total_ml(self) -> int:
+        """Get the total milliliters of water used today."""
+        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
+
     @property
     def detection_sensitivity(self) -> str:
         """Get the detection sensitivity."""
@@ -142,14 +147,15 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("realInfo", {}).get("waterStopSwitch", False)
 
     @property
-    def water_dispensing_mode(self) -> str:
+    def water_dispensing_mode(self) -> str | None:
         """Return the label used by the select (must match options_list)."""
         real = self._data.get("realInfo", {}) or {}
-        api_value = real.get("useWaterType", 0)
-        radar = real.get("radarSensingLevel", "unknown")
-        stop = real.get("waterStopSwitch", False)
 
-        # OFF overrides everything else
+        api_value = real.get("useWaterType")
+        radar = real.get("radarSensingLevel")
+        stop = real.get("waterStopSwitch")
+
+        # OFF overrides everything else when explicitly True
         if stop is True:
             self._last_water_mode_label = "Off"
             return "Off"
@@ -157,6 +163,7 @@ class Dockstream2SmartCordlessFountain(Device):
         if api_value == 0:
             self._last_water_mode_label = "Flowing Water (Constant)"
             return "Flowing Water (Constant)"
+
         elif api_value == 2:
             if radar == "NearTrigger":
                 self._last_water_mode_label = "Sensor-Activated (Near)"
@@ -164,11 +171,11 @@ class Dockstream2SmartCordlessFountain(Device):
             if radar == "FarTrigger":
                 self._last_water_mode_label = "Sensor-Activated (Far)"
                 return "Sensor-Activated (Far)"
-            # Fallback while radar update method is catching up
-            return getattr(self, "_last_water_mode_label", "Flowing Water (Constant)")
+            # Radar not landed yet: don't assert a wrong value
+            return getattr(self, "_last_water_mode_label", None)
 
-        # Fallback if unknown value returned from API, or while data is in process of being fetched.
-        return getattr(self, "_last_water_mode_label", "Flowing Water (Constant)")
+        # Unknown/unsupported/missing useWaterType:
+        return getattr(self, "_last_water_mode_label", None)
 
     async def set_water_dispensing_mode(self, value: int) -> None:
         _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
