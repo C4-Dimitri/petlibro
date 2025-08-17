@@ -6,7 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
-from ...devices.event import EVENT_UPDATE
+import asyncio
 
 _LOGGER = getLogger(__name__)
 
@@ -33,8 +33,6 @@ class Dockstream2SmartCordlessFountain(Device):
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "workRecord": get_work_record if get_work_record is not None else []
             })
-
-            self.emit(EVENT_UPDATE)
 
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for Dockstream2SmartCordlessFountain: {err}")
@@ -182,6 +180,33 @@ class Dockstream2SmartCordlessFountain(Device):
         try:
             await self.api.set_water_dispensing_mode(self.serial, value)
             await self.refresh()
+
+            # Map the desired label from the selection value
+            desired = None
+            if value == 999:
+                desired = "Off"
+            elif value == 0:
+                desired = "Flowing Water (Constant)"
+            elif value == 997:
+                desired = "Sensor-Activated (Near)"
+            elif value == 998:
+                desired = "Sensor-Activated (Far)"
+
+            resolved = self.water_dispensing_mode
+            _LOGGER.debug(
+                "Post-set snapshot for %s: desired=%s, resolved=%s",
+                self.serial, desired, resolved
+            )
+
+            # If radar/useWaterType hasn't fully landed yet, retry once after a short pause
+            if desired and resolved != desired:
+                await asyncio.sleep(0.5)
+                await self.refresh()
+                _LOGGER.debug(
+                    "Post-set second refresh for %s: resolved=%s",
+                    self.serial, self.water_dispensing_mode
+                )
+
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")

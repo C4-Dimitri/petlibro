@@ -12,7 +12,6 @@ from typing import Any
 from typing import List, Awaitable
 import logging
 from .const import DOMAIN
-from .devices.event import EVENT_UPDATE
 from homeassistant.components.select import (
     SelectEntity,
     SelectEntityDescription,
