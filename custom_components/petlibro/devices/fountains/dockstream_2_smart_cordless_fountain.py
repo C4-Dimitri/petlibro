@@ -133,12 +133,12 @@ class Dockstream2SmartCordlessFountain(Device):
     
     @property
     def detection_sensitivity(self) -> str:
-        """Check if detection sensitivity enabled."""
+        """Get the detection sensitivity."""
         return self._data.get("realInfo", {}).get("radarSensingLevel", "unknown")
 
     @property
     def water_switch(self) -> bool:
-        """Check if water switch is on enabled."""
+        """Check if water switch is on."""
         return self._data.get("realInfo", {}).get("waterStopSwitch", False)
 
     @property
