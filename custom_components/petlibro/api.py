@@ -747,7 +747,7 @@ class PetLibroAPI:
             if value == 999:
                 response = await self.session.post("/device/device/waterModeSetting", json={
                     "deviceSn": serial,
-                    "waterStopSwitch": True,  # True = off
+                    "waterStopSwitch": True,
                 },)
                 _LOGGER.debug(f"Setting water dispensing mode to OFF successfully: {response}")
                 return response
@@ -758,7 +758,7 @@ class PetLibroAPI:
                 # Turn water dispensing back on, in case it is currently off.
                 response = await self.session.post("/device/device/waterModeSetting", json={
                     "deviceSn": serial,
-                    "waterStopSwitch": False,  # False = on
+                    "waterStopSwitch": False,
                 },)
                 _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
 
@@ -786,7 +786,7 @@ class PetLibroAPI:
                 # Turn water dispensing back on, in case it is currently off.
                 response = await self.session.post("/device/device/waterModeSetting", json={
                     "deviceSn": serial,
-                    "waterStopSwitch": False,  # False = on
+                    "waterStopSwitch": False,
                 },)
                 _LOGGER.debug(f"Setting water dispensing mode to ON successfully: {response}")
 

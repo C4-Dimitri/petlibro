@@ -72,7 +72,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         if self.entity_description.current_selection is not None:
             try:
                 state = self.entity_description.current_selection(self.device)
-                return None if state is None else str(state)
+                return state if state in self.options else None
             except Exception as e:
                 _LOGGER.error("current_selection callback failed for %s: %s", self.device.name, e)
                 return None
@@ -83,14 +83,23 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             _LOGGER.warning("Current option '%s' is None for device %s", self.entity_description.key, self.device.name)
             return None
         _LOGGER.debug("Retrieved current option for '%s', %s: %s", self.entity_description.key, self.device.name, state)
-        return str(state)
+        return state if state in self.options else None
 
     async def async_select_option(self, current_selection: str) -> None:
         """Set the current_option of the select."""
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
+            # Show mapped value for water_dispensing_mode
+            if self.entity_description.key == "water_dispensing_mode":
+                api_val = PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)
+                _LOGGER.debug("%s: mapping '%s' -> %s",self.device.name, current_selection, api_val)
+                if api_val == "unknown":
+                    _LOGGER.error("Mapping failed for '%s' on %s; aborting set.",current_selection, self.device.name)
+                    return
+
             _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
             await self.entity_description.method(self.device, current_selection)
+
             _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
         except Exception as e:
             _LOGGER.error(f"Error setting current option {current_selection} for {self.device.name}: {e}")
@@ -117,7 +126,7 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
-                "Sensor-Activated (Near)": 997, # Value for capturing in the method so we can handle a different action for near vs far vs off.
+                "Sensor-Activated (Near)": 997,
                 "Sensor-Activated (Far)": 998,
                 "Off": 999
             },
