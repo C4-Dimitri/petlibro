@@ -34,6 +34,17 @@ class Dockstream2SmartCordlessFountain(Device):
                 "workRecord": get_work_record if get_work_record is not None else []
             })
 
+            # 🔎 show the key fields that drive the select
+            ri = self._data.get("realInfo", {}) or {}
+            _LOGGER.debug(
+                "Dockstream2 refresh [%s]: stop=%r, useWaterType=%r (%s), radar=%r",
+                self.serial,
+                ri.get("waterStopSwitch"),
+                ri.get("useWaterType"),
+                type(ri.get("useWaterType")).__name__,
+                ri.get("radarSensingLevel"),
+            )
+
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for Dockstream2SmartCordlessFountain: {err}")
 
@@ -153,36 +164,37 @@ class Dockstream2SmartCordlessFountain(Device):
         """Return a simple, user-facing label; 'Unknown' until data lands."""
         real = self._data.get("realInfo", {}) or {}
 
-        # Be tolerant of types: bool-ish for stop; int-ish for mode
+        # raw values as received
         stop_raw = real.get("waterStopSwitch")
-        stop = bool(stop_raw)  # True if off
-
         mode_raw = real.get("useWaterType")
+        radar = real.get("radarSensingLevel")
+
+        # coerce to the types we expect
+        stop = bool(stop_raw)
         try:
             mode = int(mode_raw) if mode_raw is not None else None
         except (TypeError, ValueError):
-            mode = None  # unexpected format → treat as unknown
+            mode = None
 
-        radar = real.get("radarSensingLevel")
-
-        # OFF overrides everything
+        # Decide label
         if stop:
-            return "Off"
-
-        # Constant
-        if mode == 0:
-            return "Flowing Water (Constant)"
-
-        # Sensor-activated (Near/Far)
-        if mode == 2:
+            label = "Off"
+        elif mode == 0:
+            label = "Flowing Water (Constant)"
+        elif mode == 2:
             if radar == "NearTrigger":
-                return "Sensor-Activated (Near)"
-            if radar == "FarTrigger":
-                return "Sensor-Activated (Far)"
-            return "Unknown"  # waiting for radar to land
+                label = "Sensor-Activated (Near)"
+            elif radar == "FarTrigger":
+                label = "Sensor-Activated (Far)"
+            else:
+                label = "Unknown"  # waiting for radar to land
+        else:
+            label = "Unknown"
 
-        # Value not present yet, or unsupported mode returned from API
-        return "Unknown"
+        # Temporary debug logging
+        _LOGGER.debug("water_dispensing_mode resolve [%s]: stop_raw=%r → %s, mode_raw=%r → %s, radar=%r → label=%s",self.serial, stop_raw, stop, mode_raw, mode, radar, label)
+
+        return label
 
     async def set_water_dispensing_mode(self, value: int) -> None:
         _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
