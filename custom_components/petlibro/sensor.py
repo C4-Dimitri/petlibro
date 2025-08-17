@@ -1056,24 +1056,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Current Weight Percent"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="use_water_interval",
-            translation_key="use_water_interval",
-            icon="mdi:water",
-            native_unit_of_measurement="min",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            name="Water Interval"
-        ),
-        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="use_water_duration",
-            translation_key="use_water_duration",
-            icon="mdi:water",
-            native_unit_of_measurement="min",
-            device_class=SensorDeviceClass.DURATION,
-            state_class=SensorStateClass.MEASUREMENT,
-            name="Water Time Duration"
-        ),
-        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="today_total_ml",
             translation_key="today_total_ml",
             icon="mdi:water",
