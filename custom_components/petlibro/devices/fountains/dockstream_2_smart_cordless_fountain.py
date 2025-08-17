@@ -6,6 +6,7 @@ from ...exceptions import PetLibroAPIError
 from ..device import Device
 from typing import cast
 from logging import getLogger
+from ...devices.event import EVENT_UPDATE
 
 _LOGGER = getLogger(__name__)
 
@@ -32,6 +33,9 @@ class Dockstream2SmartCordlessFountain(Device):
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "workRecord": get_work_record if get_work_record is not None else []
             })
+
+            self.emit(EVENT_UPDATE)
+
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for Dockstream2SmartCordlessFountain: {err}")
 

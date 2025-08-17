@@ -88,6 +88,13 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
         _LOGGER.debug(f"Setting current option {current_selection} for {self.device.name}")
         try:
             _LOGGER.debug(f"Calling method with current option={current_selection} for {self.device.name}")
+            self._attr_current_option = (
+                self.entity_description.current_selection(self.device)
+                if self.entity_description.current_selection
+                else current_selection
+            )
+            self.async_write_ha_state()
+            
             await self.entity_description.method(self.device, current_selection)
             _LOGGER.debug(f"Current option {current_selection} set successfully for {self.device.name}")
         except Exception as e:
