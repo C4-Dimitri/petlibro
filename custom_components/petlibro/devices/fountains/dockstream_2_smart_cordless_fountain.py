@@ -280,6 +280,14 @@ class Dockstream2SmartCordlessFountain(Device):
             raise PetLibroAPIError(f"Error triggering filter reset: {err}")
 
     @property
+    def battery_state(self) -> str:
+        return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
+
+    @property
+    def electric_quantity(self) -> int:
+        return self._data.get("realInfo", {}).get("electricQuantity", 0)
+
+    @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""
         return self._data.get("realInfo", {}).get("todayTotalMl", 0)

@@ -1072,6 +1072,21 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             state_class=SensorStateClass.MEASUREMENT,
             name="Remaining Filter Days"
         ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="battery_state",
+            translation_key="battery_state",
+            icon="mdi:battery",
+            name="Battery Level"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="electric_quantity",
+            translation_key="electric_quantity",
+            icon="mdi:battery",
+            native_unit_of_measurement="%",
+            device_class=SensorDeviceClass.BATTERY,
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery / AC %"
+        ),
     ]
 }
 
