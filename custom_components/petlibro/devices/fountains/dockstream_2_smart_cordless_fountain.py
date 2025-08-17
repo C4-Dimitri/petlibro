@@ -152,20 +152,29 @@ class Dockstream2SmartCordlessFountain(Device):
     def water_dispensing_mode(self) -> str:
         """Return a simple, user-facing label; 'Unknown' until data lands."""
         real = self._data.get("realInfo", {}) or {}
-        stop = real.get("waterStopSwitch")
-        api_value = real.get("useWaterType")
+
+        # Be tolerant of types: bool-ish for stop; int-ish for mode
+        stop_raw = real.get("waterStopSwitch")
+        stop = bool(stop_raw)  # True if off
+
+        mode_raw = real.get("useWaterType")
+        try:
+            mode = int(mode_raw) if mode_raw is not None else None
+        except (TypeError, ValueError):
+            mode = None  # unexpected format → treat as unknown
+
         radar = real.get("radarSensingLevel")
 
         # OFF overrides everything
-        if stop is True:
+        if stop:
             return "Off"
 
         # Constant
-        if api_value == 0:
+        if mode == 0:
             return "Flowing Water (Constant)"
 
         # Sensor-activated (Near/Far)
-        if api_value == 2:
+        if mode == 2:
             if radar == "NearTrigger":
                 return "Sensor-Activated (Near)"
             if radar == "FarTrigger":
