@@ -20,6 +20,7 @@ class Dockstream2SmartCordlessFountain(Device):
         
             # Fetch real info from the API
             real_info = await self.api.device_real_info(self.serial)
+            data_real_info = await self.api.device_data_real_info(self.serial)
             attribute_settings = await self.api.device_attribute_settings(self.serial)
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
@@ -28,6 +29,7 @@ class Dockstream2SmartCordlessFountain(Device):
             # Update internal data with fetched API data
             self.update_data({
                 "realInfo": real_info or {},
+                "dataRealinfo": data_real_info or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
@@ -35,7 +37,7 @@ class Dockstream2SmartCordlessFountain(Device):
             })
 
             # 🔎 show the key fields that drive the select
-            ri = self._data.get("realInfo", {}) or {}
+            ri = self._data.get("dataRealinfo", {}) or {}
             _LOGGER.debug(
                 "Dockstream2 refresh [%s]: stop=%r, useWaterType=%r (%s), radar=%r",
                 self.serial,
@@ -152,17 +154,17 @@ class Dockstream2SmartCordlessFountain(Device):
     @property
     def detection_sensitivity(self) -> str:
         """Get the detection sensitivity."""
-        return self._data.get("realInfo", {}).get("radarSensingLevel", "unknown")
+        return self._data.get("dataRealinfo", {}).get("radarSensingLevel", "unknown")
 
     @property
     def water_switch(self) -> bool:
         """Check if water switch is on."""
-        return self._data.get("realInfo", {}).get("waterStopSwitch", False)
+        return self._data.get("dataRealinfo", {}).get("waterStopSwitch", False)
 
     @property
     def water_dispensing_mode(self) -> str:
         """Return a simple, user-facing label; 'Unknown' until data lands."""
-        real = self._data.get("realInfo", {}) or {}
+        real = self._data.get("dataRealinfo", {}) or {}
 
         # raw values as received
         stop_raw = real.get("waterStopSwitch")
@@ -228,12 +230,12 @@ class Dockstream2SmartCordlessFountain(Device):
 
     @property
     def water_sensing_delay(self) -> float:
-        return self._data.get("realInfo", {}).get("sensingWaterDuration", 0)
+        return self._data.get("dataRealinfo", {}).get("sensingWaterDuration", 0)
 
     async def set_water_sensing_delay(self, value: float) -> None:
         _LOGGER.debug(f"Setting water sensing delay to {value} for {self.serial}")
         try:
-            current_mode = self._data.get("realInfo", {}).get("useWaterType", 0)
+            current_mode = self._data.get("dataRealinfo", {}).get("useWaterType", 0)
             await self.api.set_water_sensing_delay(self.serial, value, current_mode)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:

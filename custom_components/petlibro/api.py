@@ -260,6 +260,32 @@ class PetLibroAPI:
             _LOGGER.error(f"Error fetching realInfo for device {device_id}: {e}")
             raise PetLibroAPIError(f"Error fetching realInfo for device {device_id}: {e}")
 
+    async def get_device_data_real_info(self, device_id: str) -> dict:
+        """Fetch real-time information for a device, with caching to prevent frequent requests."""
+        now = datetime.utcnow()
+        last_call_time = self._last_api_call_times.get(f"{device_id}_dataRealInfo")
+
+        # If we made the request within the last 10 seconds, return cached response
+        if last_call_time and (now - last_call_time) < timedelta(seconds=10):
+            _LOGGER.debug(f"Skipping dataRealInfo request for {device_id}, using cached response.")
+            return self._cached_responses.get(f"{device_id}_dataRealInfo", {})
+
+        # Otherwise, make the API call and update cache
+        try:
+            response = await self.session.request("POST", "/data/data/realInfo", json={
+                "id": device_id,
+                "deviceSn": device_id
+            })
+
+            # Store the time of the API call and the cached response
+            self._last_api_call_times[f"{device_id}_dataRealInfo"] = now
+            self._cached_responses[f"{device_id}_dataRealInfo"] = response
+
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Error fetching _dataRealInfo for device {device_id}: {e}")
+            raise PetLibroAPIError(f"Error fetching _dataRealInfo for device {device_id}: {e}")
+
     async def get_device_attribute_settings(self, device_id: str) -> dict:
         """Fetch real-time information for a device, with caching to prevent frequent requests."""
         now = datetime.utcnow()
@@ -456,6 +482,9 @@ class PetLibroAPI:
 
     async def device_real_info(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/device/realInfo", serial)
+
+    async def device_data_real_info(self, serial: str) -> Dict[str, Any]:
+        return await self.session.post_serial("/data/data/realInfo", serial)
 
     async def device_attribute_settings(self, serial: str) -> Dict[str, Any]:
         return await self.session.post_serial("/device/setting/getAttributeSetting", serial)
