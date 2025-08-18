@@ -135,9 +135,6 @@
             "today_drinking_time": {
                 "name": "Today's Total Drinking Time"
             },
-            "yesterday_drinking_time": {
-                "name": "Yesterday's Total Drinking Time"
-            },
             "today_drinking_count": {
                 "name": "Today's Total Drinking Times"
             },

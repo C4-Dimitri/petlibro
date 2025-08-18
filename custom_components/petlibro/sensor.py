@@ -178,7 +178,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         if self.entity_description.key in ["today_feeding_quantity","last_feed_quantity"]:
             return "cups"
         # For today_eating_time, display as seconds in the frontend
-        elif self.entity_description.key in ["today_eating_time", "today_drinking_time", "yesterday_drinking_time", "today_avg_time"]:
+        elif self.entity_description.key in ["today_eating_time", "today_drinking_time", "today_avg_time"]:
             return "s"
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
@@ -1130,13 +1130,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:history",
             state_class=SensorStateClass.TOTAL_INCREASING,
             name="Today's Average Drinking Time"
-        ),
-        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="yesterday_drinking_time",
-            translation_key="yesterday_drinking_time",
-            icon="mdi:history",
-            state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Yesterday's Total Drinking Time"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="today_drinking_count",

@@ -277,6 +277,11 @@ class PolarWetFoodFeeder(Device):
             _LOGGER.error(f"Failed to trigger reposition the schedule for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering reposition schedule: {err}")
 
+    @property
+    def light_switch(self) -> bool:
+        """Check if the light is enabled."""
+        return self._data.get("realInfo", {}).get("lightSwitch", False)
+
     # Method for indicator turn on
     async def set_light_on(self) -> None:
         _LOGGER.debug(f"Turning on the indicator for {self.serial}")
