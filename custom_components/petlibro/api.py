@@ -3,9 +3,14 @@
 # https://api.us.petlibro.com/device/device/list
 # https://api.us.petlibro.com/device/device/baseInfo
 # https://api.us.petlibro.com/device/device/realInfo
+# https://api.us.petlibro.com/data/data/realInfo
+# https://api.us.petlibro.com/data/deviceDrinkWater/todayDrinkData
 # https://api.us.petlibro.com/device/setting/getAttributeSetting
+# https://api.us.petlibro.com/data/event/deviceEventsV2
 # https://api.us.petlibro.com/device/ota/getUpgrade
 # https://api.us.petlibro.com/device/data/grainStatus
+# https://api.us.petlibro.com/device/feedingPlan/todayNew
+# https://api.us.petlibro.com/device/wetFeedingPlan/wetListV3
 
 from logging import getLogger
 from hashlib import md5

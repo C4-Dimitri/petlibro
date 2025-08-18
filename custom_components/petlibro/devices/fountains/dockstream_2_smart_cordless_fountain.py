@@ -287,32 +287,32 @@ class Dockstream2SmartCordlessFountain(Device):
     @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""
-        return self._data.get("drinkWater", {}).get("todayTotalMl", 0)
+        return self._data.get("getDrinkWater", {}).get("todayTotalMl", 0)
     
     @property
     def today_drinking_count(self) -> int:
         """Get the total count of times drank today."""
-        return self._data.get("drinkWater", {}).get("todayTotalTimes", 0)
+        return self._data.get("getDrinkWater", {}).get("todayTotalTimes", 0)
 
     @property
     def today_drinking_time(self) -> int:
         """Get the total time spent drinking today."""
-        return self._data.get("drinkWater", {}).get("petEatingTime", 0)
+        return self._data.get("getDrinkWater", {}).get("petEatingTime", 0)
 
     @property
     def today_avg_time(self) -> int:
         """Get the average time spent drinking in a session today."""
-        return self._data.get("drinkWater", {}).get("avgDrinkDuration", 0)
+        return self._data.get("getDrinkWater", {}).get("avgDrinkDuration", 0)
 
     @property
     def yesterday_total_ml(self) -> int:
         """Get the total milliliters of water used yesterday."""
-        return self._data.get("drinkWater", {}).get("yesterdayTotalMl", 0)
+        return self._data.get("getDrinkWater", {}).get("yesterdayTotalMl", 0)
     
     @property
     def yesterday_drinking_count(self) -> int:
         """Get the total count of times drank yesterday."""
-        return self._data.get("drinkWater", {}).get("yesterdayTotalTimes", 0)
+        return self._data.get("getDrinkWater", {}).get("yesterdayTotalTimes", 0)
 
     @property
     def filter_replacement_frequency(self) -> int:
