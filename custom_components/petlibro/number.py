@@ -327,7 +327,7 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             native_step=1,
             value=lambda device: device.water_low_threshold,
             method=lambda device, value: device.set_water_low_threshold(value),
-            name="Water Level Low Threshold"
+            name="Water Low Threshold"
         ),
         PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
             key="cleaning_cycle",

@@ -278,6 +278,12 @@
             "water_interval": {
                 "name": "Water Interval"
             },
+            "water_low_threshold": {
+                "name": "Water Low Threshold"
+            },
+            "water_sensing_delay": {
+                "name": "Water Sensing Delay"
+            },
             "water_dispensing_duration": {
                 "name": "Water Dispensing Duration"
             },
