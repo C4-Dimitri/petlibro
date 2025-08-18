@@ -129,7 +129,7 @@
             "vacuum_mode": {
                 "name": "Vacuum Mode"
             },
-            "battery_charging_state": {
+            "battery_charge_state": {
                 "name": "Battery Status"
             },
             "today_drinking_time": {

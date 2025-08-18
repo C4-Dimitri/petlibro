@@ -25,7 +25,7 @@ class Dockstream2SmartCordlessFountain(Device):
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
-            get_drink_water = await self.api.device_drink_water(self.serial)
+            get_drink_water = await self.api.get_device_drink_water(self.serial)
 
             # Update internal data with fetched API data
             self.update_data({
@@ -255,7 +255,7 @@ class Dockstream2SmartCordlessFountain(Device):
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
-    def battery_charging_state(self) -> str:
+    def battery_charge_state(self) -> str:
         api_value = cast(str, self._data.get("dataRealInfo", {}).get("powerState", "unknown"))
         
         # Direct mapping inside the property
