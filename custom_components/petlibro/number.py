@@ -317,16 +317,16 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             name="Water Sensing Delay"
         ),
         PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](
-            key="water_level_low_threshold",
-            translation_key="water_level_low_threshold",
+            key="water_low_threshold",
+            translation_key="water_low_threshold",
             icon="mdi:gauge",
             mode="slider",
             native_unit_of_measurement="mL",
             native_max_value=3000,
             native_min_value=650,
             native_step=1,
-            value=lambda device: device.water_level_low_threshold,
-            method=lambda device, value: device.set_water_level_low_threshold(value),
+            value=lambda device: device.water_low_threshold,
+            method=lambda device, value: device.set_water_low_threshold(value),
             name="Water Level Low Threshold"
         ),
         PetLibroNumberEntityDescription[Dockstream2SmartCordlessFountain](

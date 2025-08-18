@@ -205,17 +205,17 @@ class Dockstream2SmartCordlessFountain(Device):
             raise PetLibroAPIError(f"Error setting water sensing delay using {current_mode}: {err}")
 
     @property
-    def water_level_low_threshold(self) -> float:
+    def water_low_threshold(self) -> float:
         return self._data.get("dataRealInfo", {}).get("lowWater", 0)
 
-    async def set_water_level_low_threshold(self, value: float) -> None:
-        _LOGGER.debug(f"Setting water level low reminder to {value} for {self.serial}")
+    async def set_water_low_threshold(self, value: float) -> None:
+        _LOGGER.debug(f"Setting water low threshold to {value} for {self.serial}")
         try:
-            await self.api.set_water_level_low_threshold(self.serial, value)
+            await self.api.set_water_low_threshold(self.serial, value)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water level low threshold to {value} for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water level low threshold: {err}")
+            _LOGGER.error(f"Failed to set water low threshold to {value} for {self.serial}: {err}")
+            raise PetLibroAPIError(f"Error setting water low threshold: {err}")
 
     @property
     def cleaning_cycle(self) -> float:
