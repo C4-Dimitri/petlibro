@@ -130,8 +130,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Battery Status"
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -178,8 +178,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Battery Status"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -226,8 +226,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Battery Status"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -353,8 +353,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Sleep Mode"
         ),
         PetLibroBinarySensorEntityDescription[PolarWetFoodFeeder](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -424,8 +424,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Sound Status"
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -441,8 +441,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Wi-Fi"
         ),
         PetLibroBinarySensorEntityDescription[DockstreamSmartFountain](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"
@@ -475,8 +475,8 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             name="Wi-Fi"
         ),
         PetLibroBinarySensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="light",
-            translation_key="light",
+            key="light_switch",
+            translation_key="light_switch",
             icon="mdi:lightbulb",
             should_report=lambda device: device.light_switch is not None,
             name="Indicator"

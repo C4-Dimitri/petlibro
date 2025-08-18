@@ -256,17 +256,15 @@ class Dockstream2SmartCordlessFountain(Device):
 
     @property
     def battery_charge_state(self) -> str:
-        api_value = cast(str, self._data.get("dataRealInfo", {}).get("powerState", "unknown"))
-        
-        # Direct mapping inside the property
+        real = self._data.get("dataRealInfo") or self._data.get("realInfo") or {}
+        api_value = (real.get("powerState") or "").upper()
         if api_value == "CHARGED":
             return "Fully Charged"
-        elif api_value == "CHARGING":
+        if api_value == "CHARGING":
             return "Charging"
-        elif api_value == "USING":
+        if api_value == "USING":
             return "Discharging"
-        else:
-            return "Unknown"
+        return "Unknown"
 
     @property
     def power_state(self) -> int:
