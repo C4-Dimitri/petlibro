@@ -144,7 +144,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     @property
     def light_switch(self) -> bool:
         """Check if the light is enabled."""
-        return self._data.get("realInfo", {}).get("lightSwitch", False)
+        return bool(self._data.get("realInfo", {}).get("lightSwitch", False))
 
     @property
     def vacuum_state(self) -> bool:
