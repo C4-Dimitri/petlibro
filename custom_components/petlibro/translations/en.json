@@ -128,6 +128,24 @@
             },
             "vacuum_mode": {
                 "name": "Vacuum Mode"
+            },
+            "battery_charge_state": {
+                "name": "Battery Status"
+            },
+            "today_drinking_time": {
+                "name": "Today's Total Drinking Time"
+            },
+            "today_drinking_count": {
+                "name": "Today's Total Drinking Times"
+            },
+            "yesterday_drinking_count": {
+                "name": "Yesterday's Total Drinking Times"
+            },
+            "today_avg_time": {
+                "name": "Today's Average Drinking Time"
+            },
+            "yesterday_total_ml": {
+                "name": "Yesterday's Water Consumption (mL)"
             }
         },
         "switch": {
@@ -172,12 +190,6 @@
             "sound_off": {
                 "name": "Turn Off Sound"
             },
-            "light_on": {
-                "name": "Turn On Light"
-            },
-            "light_off": {
-                "name": "Turn Off Light"
-            },
             "sleep_on": {
                 "name": "Turn On Sleep Mode"
             },
@@ -190,7 +202,6 @@
             "ring_bell": {
                 "name": "Ring Bell"
             },
-
             "rotate_food_bowl": {
                 "name": "Rotate Food Bowl"
             },
@@ -247,8 +258,11 @@
             "display_switch": {
                 "name": "Display Status"
             },
-            "light": {
+            "light_switch": {
                 "name": "Indicator"
+            },
+            "power_state": {
+                "name": "Power State"
             }
         },
         "number": {
@@ -264,11 +278,17 @@
             "water_interval": {
                 "name": "Water Interval"
             },
+            "water_low_threshold": {
+                "name": "Water Low Threshold"
+            },
+            "water_sensing_delay": {
+                "name": "Water Sensing Delay"
+            },
             "water_dispensing_duration": {
                 "name": "Water Dispensing Duration"
             },
             "cleaning_cycle": {
-                "name": "Cleanining Cycle"
+                "name": "Cleaning Cycle"
             },
             "filter_cycle": {
                 "name": "Filter Cycle"
