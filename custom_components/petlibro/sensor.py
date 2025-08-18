@@ -104,6 +104,21 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
             eating_time_seconds = getattr(self.device, sensor_key, 0)
             return eating_time_seconds
 
+        # Handle today_drinking_time as raw seconds value
+        elif sensor_key == "today_drinking_time":
+            drinking_time_seconds = getattr(self.device, sensor_key, 0)
+            return drinking_time_seconds
+
+        # Handle yesterday_drinking_time as raw seconds value
+        elif sensor_key == "today_avg_time":
+            today_avg_time_seconds = getattr(self.device, sensor_key, 0)
+            return today_avg_time_seconds
+
+        # Handle yesterday_drinking_time as raw seconds value
+        elif sensor_key == "yesterday_drinking_time":
+            yesterday_drinking_time_seconds = getattr(self.device, sensor_key, 0)
+            return yesterday_drinking_time_seconds
+
         # Handle today_feeding_quantity or last_feed_quantity as raw numeric value, converting to cups
         elif sensor_key in ["today_feeding_quantity","last_feed_quantity"]:
             feeding_quantity = getattr(self.device, sensor_key, 0) or 0
@@ -163,7 +178,7 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         if self.entity_description.key in ["today_feeding_quantity","last_feed_quantity"]:
             return "cups"
         # For today_eating_time, display as seconds in the frontend
-        elif self.entity_description.key == "today_eating_time":
+        elif self.entity_description.key in ["today_eating_time", "today_drinking_time", "yesterday_drinking_time", "today_avg_time"]:
             return "s"
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
@@ -1061,7 +1076,15 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Total Water Used Today"
+            name="Today's Water Consumption (mL)"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="yesterday_total_ml",
+            translation_key="yesterday_total_ml",
+            icon="mdi:water",
+            native_unit_of_measurement="mL",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Yesterday's Water Consumption (mL)"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="remaining_filter_days",
@@ -1086,6 +1109,48 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             device_class=SensorDeviceClass.BATTERY,
             state_class=SensorStateClass.MEASUREMENT,
             name="Battery / AC %"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="battery_charging_state",
+            translation_key="battery_charging_state",
+            icon="mdi:battery",
+            state_class=SensorStateClass.MEASUREMENT,
+            name="Battery Status"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="today_drinking_time",
+            translation_key="today_drinking_time",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today's Total Drinking Time"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="today_avg_time",
+            translation_key="today_avg_time",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today's Average Drinking Time"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="yesterday_drinking_time",
+            translation_key="yesterday_drinking_time",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Yesterday's Total Drinking Time"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="today_drinking_count",
+            translation_key="today_drinking_count",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Drinking Times"
+        ),
+        PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
+            key="yesterday_drinking_count",
+            translation_key="yesterday_drinking_count",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Yesterday Drinking Times"
         ),
     ]
 }

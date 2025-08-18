@@ -25,27 +25,18 @@ class Dockstream2SmartCordlessFountain(Device):
             get_upgrade = await self.api.get_device_upgrade(self.serial)
             get_work_record = await self.api.get_device_work_record(self.serial)
             get_feeding_plan_today = await self.api.device_feeding_plan_today_new(self.serial)
+            get_drink_water = await self.api.device_drink_water(self.serial)
 
             # Update internal data with fetched API data
             self.update_data({
                 "realInfo": real_info or {},
-                "dataRealinfo": data_real_info or {},
+                "dataRealInfo": data_real_info or {},
+                "getDrinkWater": get_drink_water or {},
                 "getAttributeSetting": attribute_settings or {},
                 "getUpgrade": get_upgrade or {},
                 "getfeedingplantoday": get_feeding_plan_today or {},
                 "workRecord": get_work_record if get_work_record is not None else []
             })
-
-            # 🔎 show the key fields that drive the select
-            ri = self._data.get("dataRealinfo", {}) or {}
-            _LOGGER.debug(
-                "Dockstream2 refresh [%s]: stop=%r, useWaterType=%r (%s), radar=%r",
-                self.serial,
-                ri.get("waterStopSwitch"),
-                ri.get("useWaterType"),
-                type(ri.get("useWaterType")).__name__,
-                ri.get("radarSensingLevel"),
-            )
 
         except PetLibroAPIError as err:
             _LOGGER.error(f"Error refreshing data for Dockstream2SmartCordlessFountain: {err}")
@@ -107,26 +98,6 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("realInfo", {}).get("remainingCleaningDays", 0)
     
     @property
-    def vacuum_state(self) -> bool:
-        """Check if the vacuum state is active."""
-        return self._data.get("realInfo", {}).get("vacuumState", False)
-    
-    @property
-    def pump_air_state(self) -> bool:
-        """Check if the air pump is active."""
-        return self._data.get("realInfo", {}).get("pumpAirState", False)
-    
-    @property
-    def barn_door_error(self) -> bool:
-        """Check if there's a barn door error."""
-        return self._data.get("realInfo", {}).get("barnDoorError", False)
-    
-    @property
-    def running_state(self) -> str:
-        """Get the current running state of the device."""
-        return self._data.get("realInfo", {}).get("runningState", "unknown")
-    
-    @property
     def light_switch(self) -> bool:
         """Check if the light is enabled."""
         return self._data.get("realInfo", {}).get("lightSwitch", False)
@@ -159,12 +130,12 @@ class Dockstream2SmartCordlessFountain(Device):
     @property
     def water_switch(self) -> bool:
         """Check if water switch is on."""
-        return self._data.get("dataRealinfo", {}).get("waterStopSwitch", False)
+        return self._data.get("dataRealInfo", {}).get("waterStopSwitch", False)
 
     @property
     def water_dispensing_mode(self) -> str:
         """Get current water dispensing mode."""
-        real = self._data.get("dataRealinfo", {}) or {}
+        real = self._data.get("dataRealInfo", {}) or {}
 
         # raw values as received
         stop_raw = real.get("waterStopSwitch")
@@ -221,12 +192,12 @@ class Dockstream2SmartCordlessFountain(Device):
 
     @property
     def water_sensing_delay(self) -> float:
-        return self._data.get("dataRealinfo", {}).get("sensingWaterDuration", 0)
+        return self._data.get("dataRealInfo", {}).get("sensingWaterDuration", 0)
 
     async def set_water_sensing_delay(self, value: float) -> None:
         _LOGGER.debug(f"Setting water sensing delay to {value} for {self.serial}")
         try:
-            current_mode = self._data.get("dataRealinfo", {}).get("useWaterType", 0)
+            current_mode = self._data.get("dataRealInfo", {}).get("useWaterType", 0)
             await self.api.set_water_sensing_delay(self.serial, value, current_mode)
             await self.refresh()  # Refresh the state after the action
         except aiohttp.ClientError as err:
@@ -284,14 +255,65 @@ class Dockstream2SmartCordlessFountain(Device):
         return cast(str, self._data.get("realInfo", {}).get("batteryState", "unknown"))
 
     @property
+    def battery_charging_state(self) -> str:
+        api_value = cast(str, self._data.get("dataRealInfo", {}).get("powerState", "unknown"))
+        
+        # Direct mapping inside the property
+        if api_value == "CHARGED":
+            return "Fully Charged"
+        elif api_value == "CHARGING":
+            return "Charging"
+        elif api_value == "USING":
+            return "Discharging"
+        else:
+            return "Unknown"
+
+    @property
+    def power_state(self) -> int:
+        api_value = self._data.get("dataRealInfo", {}).get("powerType", 0)
+        
+        # Direct mapping inside the property
+        if api_value == 2:
+            return False
+        elif api_value == 3:
+            return True
+        else:
+            return "Unknown"
+
+    @property
     def electric_quantity(self) -> int:
         return self._data.get("realInfo", {}).get("electricQuantity", 0)
 
     @property
     def today_total_ml(self) -> int:
         """Get the total milliliters of water used today."""
-        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
+        return self._data.get("drinkWater", {}).get("todayTotalMl", 0)
     
+    @property
+    def today_drinking_count(self) -> int:
+        """Get the total count of times drank today."""
+        return self._data.get("drinkWater", {}).get("todayTotalTimes", 0)
+
+    @property
+    def today_drinking_time(self) -> int:
+        """Get the total time spent drinking today."""
+        return self._data.get("drinkWater", {}).get("petEatingTime", 0)
+
+    @property
+    def today_avg_time(self) -> int:
+        """Get the average time spent drinking in a session today."""
+        return self._data.get("drinkWater", {}).get("avgDrinkDuration", 0)
+
+    @property
+    def yesterday_total_ml(self) -> int:
+        """Get the total milliliters of water used yesterday."""
+        return self._data.get("drinkWater", {}).get("yesterdayTotalMl", 0)
+    
+    @property
+    def yesterday_drinking_count(self) -> int:
+        """Get the total count of times drank yesterday."""
+        return self._data.get("drinkWater", {}).get("yesterdayTotalTimes", 0)
+
     @property
     def filter_replacement_frequency(self) -> int:
         """Get the filter replacement frequency."""
