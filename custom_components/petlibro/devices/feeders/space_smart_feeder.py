@@ -176,9 +176,13 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
         return bool(self._data.get("realInfo", {}).get("screenDisplaySwitch", False))
 
     @property
-    def remaining_desiccant(self) -> float:
+    def remaining_desiccant(self) -> float | None:
         """Get the remaining desiccant days."""
-        return cast(float, self._data.get("remainingDesiccantDays", 0))
+        value = self._data.get("remainingDesiccantDays")
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
 
     @property
     def sound_switch(self) -> bool:
@@ -193,7 +197,7 @@ class SpaceSmartFeeder(Device):  # Inherit directly from Device
     def food_dispenser_state(self) -> bool:
         events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
         return any(event.get("eventKey") == "GRAIN_OUTLET_BLOCKED_OVERTIME" for event in events)
-
+ 
     @property
     def food_outlet_state(self) -> bool:
         events = self._data.get("getDeviceEvents", {}).get("data", {}).get("eventInfos", [])
