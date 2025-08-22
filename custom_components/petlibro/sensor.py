@@ -325,7 +325,6 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             translation_key="last_feed_time",
             icon="mdi:history",
             name="Last Feed Time",
-            device_class=SensorDeviceClass.TIMESTAMP,
         ),
         PetLibroSensorEntityDescription[AirSmartFeeder](
             key="last_feed_quantity",
