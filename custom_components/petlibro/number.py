@@ -425,6 +425,30 @@ DEVICE_NUMBER_MAP: dict[type[Device], list[PetLibroNumberEntityDescription]] = {
             method=lambda device, value: device.set_filter_cycle(value),
             name="Filter Cycle"
         ),
+        PetLibroNumberEntityDescription[Dockstream2SmartFountain](
+            key="water_interval",
+            translation_key="water_interval",
+            icon="mdi:timer",
+            native_unit_of_measurement="m",
+            native_max_value=180,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.water_interval,
+            method=lambda device, value: device.set_water_interval(value),
+            name="Water Interval"
+        ),
+        PetLibroNumberEntityDescription[Dockstream2SmartFountain](
+            key="water_dispensing_duration",
+            translation_key="water_dispensing_duration",
+            icon="mdi:timer",
+            native_unit_of_measurement="m",
+            native_max_value=180,
+            native_min_value=1,
+            native_step=1,
+            value=lambda device: device.water_dispensing_duration,
+            method=lambda device, value: device.set_water_dispensing_duration(value),
+            name="Water Dispensing Duration"
+        ),
     ],
 }
 
