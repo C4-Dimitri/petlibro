@@ -686,6 +686,42 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing mode for device {serial}: {e}")
             raise
 
+
+    # Not supported by the dockstream device firmware yet. hoping that maybe it will be in the future, so leaving code here.
+    # async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
+    #     """Set the water sensing delay."""
+    #     _LOGGER.debug(f"Setting water sensing delay duration: serial={serial}, value={value}")
+    #     try:
+    #         # Generate a dynamic request ID for the mode switch.
+    #         request_id = str(uuid.uuid4()).replace("-", "")
+    #         response = await self.session.post("/device/device/waterModeSetting", json={
+    #             "deviceSn": serial,
+    #             "requestId": request_id,
+    #             "useWaterType": current_mode,
+    #             "useWaterInterval": None,
+    #             "useWaterDuration": None,
+    #             "sensingWaterDuration": value
+    #         })
+    #         _LOGGER.debug(f"Water sensing delay set successfully: {response}")
+    #         return response
+    #     except Exception as e:
+    #         _LOGGER.error(f"Failed to set water sensing delay for device {serial}: {e}")
+    #         raise
+
+    async def set_water_low_threshold(self, serial: str, value: float):
+        """Set the water low threshold."""
+        _LOGGER.debug(f"Setting water low threshold: serial={serial}, value={value}")
+        try:
+            response = await self.session.post("/device/setting/updateLowWaterSetting", json={
+                "deviceSn": serial,
+                "lowWater": value,
+            })
+            _LOGGER.debug(f"Water low threshold set successfully: {response}")
+            return response
+        except Exception as e:
+            _LOGGER.error(f"Failed to set water low threshold for device {serial}: {e}")
+            raise
+
     async def set_water_interval(self, serial: str, value: float, current_mode: int, current_duration: float):
         """Set the water interval."""
         _LOGGER.debug(f"Setting water interval: serial={serial}, value={value}")
@@ -852,7 +888,6 @@ class PetLibroAPI:
                     "useWaterType": 2,           # normalize 997/998 to 2
                     "useWaterInterval": None,
                     "useWaterDuration": None,
-                    "sensingWaterDuration": 45
                 },)
                 _LOGGER.debug(f"Mode set successfully after radar: {mode_response}")
                 return mode_response  # keep return type consistent (final mode call)
