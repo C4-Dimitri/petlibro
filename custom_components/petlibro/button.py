@@ -117,18 +117,6 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         ),
-        PetLibroButtonEntityDescription[GranarySmartFeeder](
-            key="light_on",
-            translation_key="light_on",
-            set_fn=lambda device: device.set_light_on(),
-            name="Turn On Indicator"
-        ),
-        PetLibroButtonEntityDescription[GranarySmartFeeder](
-            key="light_off",
-            translation_key="light_off",
-            set_fn=lambda device: device.set_light_off(),
-            name="Turn Off Indicator"
-        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](

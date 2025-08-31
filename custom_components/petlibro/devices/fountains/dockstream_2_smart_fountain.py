@@ -196,7 +196,6 @@ class Dockstream2SmartFountain(Device):
             raise PetLibroAPIError(f"Error setting water dispensing duration using {current_mode} & {current_interval}: {err}")
 
     # Not currently supported by the device, API accepts, but device doesnt apply. hoping for future firmware update.
-
     # @property
     # def water_sensing_delay(self) -> float:
     #     return self._data.get("dataRealInfo", {}).get("sensingWaterDuration", 0)
