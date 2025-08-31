@@ -760,26 +760,6 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
-    async def set_water_sensing_delay(self, serial: str, value: float, current_mode: int):
-        """Set the water sensing delay."""
-        _LOGGER.debug(f"Setting water sensing delay duration: serial={serial}, value={value}")
-        try:
-            # Generate a dynamic request ID for the mode switch.
-            request_id = str(uuid.uuid4()).replace("-", "")
-            response = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "requestId": request_id,
-                "useWaterType": current_mode,
-                "useWaterInterval": None,
-                "useWaterDuration": None,
-                "sensingWaterDuration": value
-            })
-            _LOGGER.debug(f"Water sensing delay set successfully: {response}")
-            return response
-        except Exception as e:
-            _LOGGER.error(f"Failed to set water sensing delay for device {serial}: {e}")
-            raise
-
     async def set_water_low_threshold(self, serial: str, value: float):
         """Set the water low threshold."""
         _LOGGER.debug(f"Setting water low threshold: serial={serial}, value={value}")

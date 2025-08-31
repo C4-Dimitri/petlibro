@@ -124,8 +124,8 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
             "water_dispensing_mode": {
                 "Flowing Water (Constant)": 0,
                 "Intermittent Water (Scheduled)": 1,
-                "Sensor-Activated (Near)": 2,
-                "Sensor-Activated (Far)": 2,
+                "Sensor-Activated (Near)": 997,
+                "Sensor-Activated (Far)": 998,
                 "Off": 999
             },
             "vacuum_mode": {
