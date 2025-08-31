@@ -34,7 +34,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     AirSmartFeeder: (
         Platform.SENSOR,
@@ -44,7 +44,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     GranarySmartFeeder: (
         Platform.SENSOR,
@@ -54,7 +54,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     GranarySmartCameraFeeder: (
         Platform.SENSOR,
@@ -64,7 +64,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     OneRFIDSmartFeeder: (
         Platform.SENSOR,
@@ -74,7 +74,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     PolarWetFoodFeeder: (
         Platform.SENSOR,
@@ -84,7 +84,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     SpaceSmartFeeder: (
         Platform.SENSOR,
@@ -94,7 +94,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     DockstreamSmartFountain: (
         Platform.SENSOR,
@@ -104,7 +104,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     DockstreamSmartRFIDFountain: (
         Platform.SENSOR,
@@ -114,7 +114,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     Dockstream2SmartCordlessFountain: (
         Platform.SENSOR,
@@ -124,7 +124,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
     Dockstream2SmartFountain: (
         Platform.SENSOR,
@@ -134,7 +134,7 @@ PLATFORMS_BY_TYPE = {
         Platform.NUMBER,
         Platform.SELECT,
         Platform.TEXT,
-        Platform.UPDATE,
+        Platform.UPDATE
     ),
 }
 

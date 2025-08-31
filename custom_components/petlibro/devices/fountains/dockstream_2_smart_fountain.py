@@ -10,7 +10,7 @@ from logging import getLogger
 _LOGGER = getLogger(__name__)
 
 class Dockstream2SmartFountain(Device):
-    """Represents the Dockstream 2 Smart Cordless Fountain device."""
+    """Represents the Dockstream 2 Smart Fountain device."""
 
     async def refresh(self):
         """Refresh the device data from the API."""
