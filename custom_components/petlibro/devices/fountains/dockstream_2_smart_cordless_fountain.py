@@ -113,7 +113,7 @@ class Dockstream2SmartCordlessFountain(Device):
     @property
     def detection_sensitivity(self) -> str:
         """Get the detection sensitivity."""
-        return self._data.get("dataRealinfo", {}).get("radarSensingLevel", "unknown")
+        return self._data.get("dataRealInfo", {}).get("radarSensingLevel", "unknown")
 
     @property
     def water_switch(self) -> bool:
@@ -153,30 +153,6 @@ class Dockstream2SmartCordlessFountain(Device):
             label = "Unknown"
 
         return label
-
-    async def set_water_dispensing_mode(self, value: int) -> None:
-        _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
-        try:
-            await self.api.set_water_dispensing_mode(self.serial, value)
-            await self.refresh()
-
-            # Map the desired label from the selection value
-            desired = None
-            if value == 999:
-                desired = "Off"
-            elif value == 0:
-                desired = "Flowing Water (Constant)"
-            elif value == 997:
-                desired = "Sensor-Activated (Near)"
-            elif value == 998:
-                desired = "Sensor-Activated (Far)"
-
-            resolved = self.water_dispensing_mode
-            _LOGGER.debug("Post-set snapshot for %s: desired=%s, resolved=%s",self.serial, desired, resolved)
-
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
 
     # Not currently supported by the device, API accepts, but device doesnt apply. hoping for future firmware update.
     

@@ -157,15 +157,6 @@ class DockstreamSmartRFIDFountain(Device):
         else:
             return "Unknown"
 
-    async def set_water_dispensing_mode(self, value: int) -> None:
-        _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
-        try:
-            await self.api.set_water_dispensing_mode(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
-
     @property
     def water_interval(self) -> float:
         return self._data.get("realInfo", {}).get("useWaterInterval", 0)

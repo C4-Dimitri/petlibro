@@ -40,6 +40,10 @@ from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2S
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 
+
+async def _apply_and_refresh(device, action_coro):
+    await action_coro
+    await device.refresh()
 @dataclass(frozen=True)
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
@@ -121,13 +125,6 @@ class PetLibroSelectEntity(PetLibroEntity[_DeviceT], SelectEntity):
                 "Cat": 7,
                 "Elk": 8,
             },
-            "water_dispensing_mode": {
-                "Flowing Water (Constant)": 0,
-                "Intermittent Water (Scheduled)": 1,
-                "Sensor-Activated (Near)": 997,
-                "Sensor-Activated (Far)": 998,
-                "Off": 999
-            },
             "vacuum_mode": {
                 "Study": "LEARNING",
                 "Normal": "NORMAL",
@@ -190,7 +187,11 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
-            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            method=lambda d, opt: (
+                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial))
+                if opt == "Intermittent Water (Scheduled)"
+                else _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+            ),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
         ),
@@ -201,7 +202,12 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
-            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            method=lambda d, opt: (
+                _apply_and_refresh(d, d.api.set_water_mode_off(d.serial)) if opt == "Off" else
+                _apply_and_refresh(d, d.api.set_water_mode_radar_near(d.serial)) if opt == "Sensor-Activated (Near)" else
+                _apply_and_refresh(d, d.api.set_water_mode_radar_far(d.serial)) if opt == "Sensor-Activated (Far)" else
+                _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))  # Flowing Water (Constant)
+            ),
             options_list=['Flowing Water (Constant)','Sensor-Activated (Near)','Sensor-Activated (Far)','Off'],
             name="Water Dispensing Mode"
         ),
@@ -212,8 +218,12 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
-            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
-            options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
+            method=lambda d, opt: (
+                _apply_and_refresh(d, d.api.set_water_mode_off(d.serial)) if opt == "Off" else
+                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial)) if opt == "Intermittent Water (Scheduled)" else
+                _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+            ),
+            options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)','Off'],
             name="Water Dispensing Mode"
         ),
     ],
@@ -223,7 +233,11 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             translation_key="water_dispensing_mode",
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
-            method=lambda device, current_selection: device.set_water_dispensing_mode(PetLibroSelectEntity.map_value_to_api(key="water_dispensing_mode", current_selection=current_selection)),
+            method=lambda d, opt: (
+                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial))
+                if opt == "Intermittent Water (Scheduled)"
+                else _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+            ),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
         ),

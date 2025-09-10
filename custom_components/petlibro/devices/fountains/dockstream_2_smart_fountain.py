@@ -144,28 +144,6 @@ class Dockstream2SmartFountain(Device):
         return label
 
     @property
-    def water_dispensing_mode(self) -> int:
-        """Return the user-friendly water dispensing mode (mapped directly from the API value)."""
-        api_value = self._data.get("realInfo", {}).get("useWaterType", 0)
-        
-        # Direct mapping inside the property
-        if api_value == 0:
-            return "Flowing Water (Constant)"
-        elif api_value == 1:
-            return "Intermittent Water (Scheduled)"
-        else:
-            return "Unknown"
-
-    async def set_water_dispensing_mode(self, value: int) -> None:
-        _LOGGER.debug(f"Setting water dispensing mode to {value} for {self.serial}")
-        try:
-            await self.api.set_water_dispensing_mode(self.serial, value)
-            await self.refresh()  # Refresh the state after the action
-        except aiohttp.ClientError as err:
-            _LOGGER.error(f"Failed to set water dispensing mode for {self.serial}: {err}")
-            raise PetLibroAPIError(f"Error setting water dispensing mode: {err}")
-
-    @property
     def water_interval(self) -> float:
         return self._data.get("realInfo", {}).get("useWaterInterval", 0)
 
