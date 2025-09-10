@@ -299,7 +299,7 @@ class PetLibroAPI:
         # If we made the request within the last 10 seconds, return cached response
         if last_call_time and (now - last_call_time) < timedelta(seconds=10):
             _LOGGER.debug(f"Skipping drinkWater request for {device_id}, using cached response.")
-            return self._cached_responses.get(f"{device_id}_dataRealInfo", {})
+            return self._cached_responses.get(f"{device_id}_drinkWater", {})
 
         # Otherwise, make the API call and update cache
         try:
