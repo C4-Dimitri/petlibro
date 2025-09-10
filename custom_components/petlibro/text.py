@@ -100,6 +100,10 @@ DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     ],
     DockstreamSmartRFIDFountain: [
     ],
+    Dockstream2SmartFountain: [
+    ],
+    Dockstream2SmartCordlessFountain: [
+    ],
 }
 
 async def async_setup_entry(

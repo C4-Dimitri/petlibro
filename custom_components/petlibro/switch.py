@@ -70,6 +70,10 @@ DEVICE_SWITCH_MAP: dict[type[Device], list[PetLibroSwitchEntityDescription]] = {
     ],
     DockstreamSmartRFIDFountain: [
     ],
+    Dockstream2SmartCordlessFountain: [
+    ],
+    Dockstream2SmartFountain: [
+    ],
 }
 
 class PetLibroSwitchEntity(PetLibroEntity[_DeviceT], SwitchEntity):
