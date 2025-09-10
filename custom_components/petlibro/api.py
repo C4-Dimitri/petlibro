@@ -760,20 +760,6 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set water dispensing duration for device {serial}: {e}")
             raise
 
-    async def set_water_low_threshold(self, serial: str, value: float):
-        """Set the water low threshold."""
-        _LOGGER.debug(f"Setting water low threshold: serial={serial}, value={value}")
-        try:
-            response = await self.session.post("/device/setting/updateLowWaterSetting", json={
-                "deviceSn": serial,
-                "lowWater": value,
-            })
-            _LOGGER.debug(f"Water low threshold set successfully: {response}")
-            return response
-        except Exception as e:
-            _LOGGER.error(f"Failed to set water low threshold for device {serial}: {e}")
-            raise
-
     async def set_cleaning_cycle(self, serial: str, value: float, key: str) -> JSON:
         """Set the machine cleaning cycle."""
         _LOGGER.debug(f"Setting machine cleaning cycle: serial={serial}, value={value}, key={key}")
