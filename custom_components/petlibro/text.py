@@ -71,6 +71,7 @@ class PetLibroTextEntity(PetLibroEntity[_DeviceT], TextEntity):
             self.async_write_ha_state()
         except Exception as e:
             _LOGGER.error(f"Error setting value {native_value} for {self.device.name}: {e}")
+
 DEVICE_TEXT_MAP: dict[type[Device], list[PetLibroTextEntityDescription]] = {
     Feeder: [
     ],

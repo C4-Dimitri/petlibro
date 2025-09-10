@@ -846,7 +846,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set OFF for {serial}: {e}")
             raise
 
-    async def set_water_mode_radar_near(self, serial: str | None = None):
+    async def set_water_mode_radar_near(self, serial: str, interval: int, duration: int | None = None):
         """Sensed (Near): set radar to NearTrigger, then useWaterType=2."""
         _LOGGER.debug(f"set_water_mode_radar_near: serial={serial}")
         try:
@@ -857,22 +857,20 @@ class PetLibroAPI:
             _LOGGER.debug(f"Radar Near updated: {radar_resp}")
 
             request_id = str(uuid.uuid4()).replace("-", "")
-            payload = {
+            mode_resp = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "requestId": request_id,
                 "useWaterType": 2,             # sensed
-                "useWaterInterval": None,
-                "useWaterDuration": None,
-            }
-
-            mode_resp = await self.session.post("/device/device/waterModeSetting", json=payload)
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
             _LOGGER.debug(f"Sensed mode (Near) set: {mode_resp}")
             return mode_resp
         except Exception as e:
             _LOGGER.error(f"Failed to set Sensed Near for {serial}: {e}")
             raise
 
-    async def set_water_mode_radar_far(self, serial: str | None = None):
+    async def set_water_mode_radar_far(self, serial: str, interval: int, duration: int | None = None):
         """Sensed (Far): set radar to FarTrigger, then useWaterType=2."""
         _LOGGER.debug(f"set_water_mode_radar_far: serial={serial}")
         try:
@@ -883,22 +881,20 @@ class PetLibroAPI:
             _LOGGER.debug(f"Radar Near updated: {radar_resp}")
 
             request_id = str(uuid.uuid4()).replace("-", "")
-            payload = {
+            mode_resp = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "requestId": request_id,
                 "useWaterType": 2,             # sensed
-                "useWaterInterval": None,
-                "useWaterDuration": None,
-            }
-
-            mode_resp = await self.session.post("/device/device/waterModeSetting", json=payload)
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
+            })
             _LOGGER.debug(f"Sensed mode (Far) set: {mode_resp}")
             return mode_resp
         except Exception as e:
             _LOGGER.error(f"Failed to set Sensed Far for {serial}: {e}")
             raise
 
-    async def set_water_mode_intermittent(self, serial: str | None = None):
+    async def set_water_mode_intermittent(self, serial: str, interval: int, duration: int  | None = None):
         """Intermittent (Scheduled): useWaterType=1; """
         _LOGGER.debug(f"set_water_mode_intermittent: serial={serial}")
         try:
@@ -907,8 +903,8 @@ class PetLibroAPI:
                 "deviceSn": serial,
                 "requestId": request_id,
                 "useWaterType": 1,             # intermittent
-                "useWaterInterval": None,
-                "useWaterDuration": None,
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
             })
             _LOGGER.debug(f"Intermittent set successfully: {resp}")
             return resp
@@ -916,7 +912,7 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set Intermittent for {serial}: {e}")
             raise
 
-    async def set_water_mode_constant(self, serial: str | None = None):
+    async def set_water_mode_constant(self, serial: str, interval: int, duration: int | None = None):
         """Constant: useWaterType=0."""
         _LOGGER.debug(f"set_water_mode_constant: serial={serial}")
         try:
@@ -925,8 +921,8 @@ class PetLibroAPI:
                 "deviceSn": serial,
                 "requestId": request_id,
                 "useWaterType": 0,             # constant
-                "useWaterInterval": None,
-                "useWaterDuration": None,
+                "useWaterInterval": interval,
+                "useWaterDuration": duration,
             })
             _LOGGER.debug(f"Constant set successfully: {resp}")
             return resp

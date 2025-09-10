@@ -44,6 +44,22 @@ from .entity import PetLibroEntity, _DeviceT, PetLibroEntityDescription
 async def _apply_and_refresh(device, action_coro):
     await action_coro
     await device.refresh()
+
+async def _current_schedule(device):
+    """Return the best-known interval/duration from the device cache."""
+    interval = int(getattr(device, "water_interval") or 0)
+    duration = int(getattr(device, "water_dispensing_duration") or 0)
+    return interval, duration
+
+
+async def _apply_with_cached_schedule(device, builder):
+    """
+    Read the device's cached interval/duration, call the API builder(interval, duration),
+    then refresh the device.
+    """
+    interval, duration = await _current_schedule(device)
+    return await _apply_and_refresh(device, builder(interval, duration))
+
 @dataclass(frozen=True)
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device select entities."""
@@ -188,9 +204,9 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
             method=lambda d, opt: (
-                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial))
+                _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_intermittent(d.serial, interval, duration))
                 if opt == "Intermittent Water (Scheduled)"
-                else _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+                else _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_constant(d.serial, interval, duration))
             ),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
@@ -220,8 +236,8 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             current_selection=lambda device: device.water_dispensing_mode,
             method=lambda d, opt: (
                 _apply_and_refresh(d, d.api.set_water_mode_off(d.serial)) if opt == "Off" else
-                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial)) if opt == "Intermittent Water (Scheduled)" else
-                _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+                _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_intermittent(d.serial, interval, duration)) if opt == "Intermittent Water (Scheduled)" else
+                _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_constant(d.serial, interval, duration))
             ),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)','Off'],
             name="Water Dispensing Mode"
@@ -234,9 +250,9 @@ DEVICE_SELECT_MAP: dict[type[Device], list[PetLibroSelectEntityDescription]] = {
             icon="mdi:arrow-oscillating",
             current_selection=lambda device: device.water_dispensing_mode,
             method=lambda d, opt: (
-                _apply_and_refresh(d, d.api.set_water_mode_intermittent(d.serial))
+                _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_intermittent(d.serial, interval, duration))
                 if opt == "Intermittent Water (Scheduled)"
-                else _apply_and_refresh(d, d.api.set_water_mode_constant(d.serial))
+                else _apply_with_cached_schedule(d, lambda interval, duration: d.api.set_water_mode_constant(d.serial, interval, duration))
             ),
             options_list=['Flowing Water (Constant)','Intermittent Water (Scheduled)'],
             name="Water Dispensing Mode"
