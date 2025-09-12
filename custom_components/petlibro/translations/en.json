@@ -133,7 +133,7 @@
                 "name": "Today's Feeding Plan"
             },
             "today_total_ml": {
-                "name": "Today's Water Consumption (mL)"
+                "name": "Today's Water Consumption"
             },
             "weight": {
                 "name": "Current Weight"
@@ -208,7 +208,7 @@
                 "name": "Today's Average Drinking Time"
             },
             "yesterday_total_ml": {
-                "name": "Yesterday's Water Consumption (mL)"
+                "name": "Yesterday's Water Consumption"
             }
         },
         "switch": {

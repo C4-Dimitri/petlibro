@@ -1077,7 +1077,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Today's Water Consumption (mL)"
+            device_class=SensorDeviceClass.VOLUME,
+            name="Today's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="yesterday_total_ml",
@@ -1085,7 +1086,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Yesterday's Water Consumption (mL)"
+            device_class=SensorDeviceClass.VOLUME,
+            name="Yesterday's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
             key="remaining_filter_days",
@@ -1203,7 +1205,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Today's Water Consumption (mL)"
+            device_class=SensorDeviceClass.VOLUME,
+            name="Today's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
             key="yesterday_total_ml",
@@ -1211,7 +1214,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
-            name="Yesterday's Water Consumption (mL)"
+            device_class=SensorDeviceClass.VOLUME,
+            name="Yesterday's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
             key="remaining_filter_days",

@@ -51,7 +51,6 @@ async def _current_schedule(device):
     duration = int(getattr(device, "water_dispensing_duration") or 0)
     return interval, duration
 
-
 async def _apply_with_cached_schedule(device, builder):
     """
     Read the device's cached interval/duration, call the API builder(interval, duration),
