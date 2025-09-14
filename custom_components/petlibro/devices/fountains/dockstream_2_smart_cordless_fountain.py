@@ -106,11 +106,6 @@ class Dockstream2SmartCordlessFountain(Device):
         await self.refresh()
 
     @property
-    def today_total_ml(self) -> int:
-        """Get the total milliliters of water used today."""
-        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
-
-    @property
     def detection_sensitivity(self) -> str:
         """Get the detection sensitivity."""
         return self._data.get("dataRealInfo", {}).get("radarSensingLevel", "unknown")
@@ -269,7 +264,7 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("realInfo", {}).get("electricQuantity", 0)
 
     @property
-    def today_total_ml(self) -> int:
+    def today_drinking_amount(self) -> int:
         """Get the total milliliters of water used today."""
         return self._data.get("getDrinkWater", {}).get("todayTotalMl", 0)
     
@@ -289,7 +284,7 @@ class Dockstream2SmartCordlessFountain(Device):
         return self._data.get("getDrinkWater", {}).get("avgDrinkDuration", 0)
 
     @property
-    def yesterday_total_ml(self) -> int:
+    def yesterday_drinking_amount(self) -> int:
         """Get the total milliliters of water used yesterday."""
         return self._data.get("getDrinkWater", {}).get("yesterdayTotalMl", 0)
     

@@ -232,11 +232,6 @@ class DockstreamSmartRFIDFountain(Device):
         except aiohttp.ClientError as err:
             _LOGGER.error(f"Failed to trigger filter reset for {self.serial}: {err}")
             raise PetLibroAPIError(f"Error triggering filter reset: {err}")
-
-    @property
-    def today_total_ml(self) -> int:
-        """Get the total milliliters of water used today."""
-        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
     
     @property
     def use_water_interval(self) -> int:

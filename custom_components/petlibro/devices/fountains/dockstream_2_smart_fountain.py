@@ -106,11 +106,6 @@ class Dockstream2SmartFountain(Device):
         await self.refresh()
 
     @property
-    def today_total_ml(self) -> int:
-        """Get the total milliliters of water used today."""
-        return self._data.get("realInfo", {}).get("todayTotalMl", 0)
-
-    @property
     def water_switch(self) -> bool:
         """Check if water switch is on."""
         return self._data.get("dataRealInfo", {}).get("waterStopSwitch", False)
@@ -260,7 +255,7 @@ class Dockstream2SmartFountain(Device):
             return "Unknown"
 
     @property
-    def today_total_ml(self) -> int:
+    def today_drinking_amount(self) -> int:
         """Get the total milliliters of water used today."""
         return self._data.get("getDrinkWater", {}).get("todayTotalMl", 0)
     
@@ -280,7 +275,7 @@ class Dockstream2SmartFountain(Device):
         return self._data.get("getDrinkWater", {}).get("avgDrinkDuration", 0)
 
     @property
-    def yesterday_total_ml(self) -> int:
+    def yesterday_drinking_amount(self) -> int:
         """Get the total milliliters of water used yesterday."""
         return self._data.get("getDrinkWater", {}).get("yesterdayTotalMl", 0)
     

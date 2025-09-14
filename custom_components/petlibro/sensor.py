@@ -182,6 +182,12 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
         # For today_eating_time, display as seconds in the frontend
         elif self.entity_description.key in ["today_eating_time", "today_drinking_time", "today_avg_time"]:
             return "s"
+        # For remaining_desiccant, remaining_cleaning_days & remaining_filter_days, display as days in the frontend
+        elif self.entity_description.key in ["remaining_cleaning_days", "remaining_filter_days", "remaining_desiccant"]:
+            return "d"
+        # For remaining_desiccant, remaining_cleaning_days & remaining_filter_days, display as days in the frontend
+        elif self.entity_description.key in ["today_drinking_amount", "yesterday_drinking_amount"]:
+            return "mL"
         # For wifi_rssi, display as dBm
         elif self.entity_description.key == "wifi_rssi":
             return "dBm"
@@ -901,6 +907,52 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Current Weight"
         ),
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="today_drinking_amount",
+            translation_key="today_drinking_amount",
+            icon="mdi:water",
+            native_unit_of_measurement="mL",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            device_class=SensorDeviceClass.VOLUME,
+            name="Today's Water Consumption"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="yesterday_drinking_amount",
+            translation_key="yesterday_drinking_amount",
+            icon="mdi:water",
+            native_unit_of_measurement="mL",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            device_class=SensorDeviceClass.VOLUME,
+            name="Yesterday's Water Consumption"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="today_drinking_time",
+            translation_key="today_drinking_time",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today's Total Drinking Time"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="today_avg_time",
+            translation_key="today_avg_time",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today's Average Drinking Time"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="today_drinking_count",
+            translation_key="today_drinking_count",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Today Drinking Times"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
+            key="yesterday_drinking_count",
+            translation_key="yesterday_drinking_count",
+            icon="mdi:history",
+            state_class=SensorStateClass.TOTAL_INCREASING,
+            name="Yesterday Drinking Times"
+        ),
+        PetLibroSensorEntityDescription[DockstreamSmartFountain](
             key="weight_percent",
             translation_key="weight_percent",
             icon="mdi:scale",
@@ -1003,8 +1055,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
         ),
 # Does not work with multi pet tracking, but may use this code later once I have the API info for the RFID tags.
 #        PetLibroSensorEntityDescription[DockstreamSmartRFIDFountain](
-#            key="today_total_ml",
-#            translation_key="today_total_ml",
+#            key="today_drinking_amount",
+#            translation_key="today_drinking_amount",
 #            icon="mdi:water",
 #            native_unit_of_measurement="mL",
 #            state_class=SensorStateClass.TOTAL_INCREASING,
@@ -1072,8 +1124,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Current Weight Percent"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="today_total_ml",
-            translation_key="today_total_ml",
+            key="today_drinking_amount",
+            translation_key="today_drinking_amount",
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
@@ -1081,8 +1133,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Today's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartCordlessFountain](
-            key="yesterday_total_ml",
-            translation_key="yesterday_total_ml",
+            key="yesterday_drinking_amount",
+            translation_key="yesterday_drinking_amount",
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
@@ -1200,8 +1252,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Current Weight Percent"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
-            key="today_total_ml",
-            translation_key="today_total_ml",
+            key="today_drinking_amount",
+            translation_key="today_drinking_amount",
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
@@ -1209,8 +1261,8 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Today's Water Consumption"
         ),
         PetLibroSensorEntityDescription[Dockstream2SmartFountain](
-            key="yesterday_total_ml",
-            translation_key="yesterday_total_ml",
+            key="yesterday_drinking_amount",
+            translation_key="yesterday_drinking_amount",
             icon="mdi:water",
             native_unit_of_measurement="mL",
             state_class=SensorStateClass.TOTAL_INCREASING,
