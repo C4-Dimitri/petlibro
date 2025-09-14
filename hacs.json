@@ -1,5 +1,6 @@
 {
   "name": "PETLIBRO",
   "render_readme": true,
-  "iot_class": "cloud_polling"
+  "homeassistant": "2025.1.0",
+  "content_in_root": false
 }
