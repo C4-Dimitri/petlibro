@@ -33,7 +33,10 @@
 ### Fountains
 * Dockstream Smart Fountain (PLWF105)
 * Dockstream RFID Smart Fountain (PLWF305)
-* Dockstream 2 Smart Cordless Fountain (PLWF116)
+
+### Pending Device(s)
+* Dockstream 2 Smart Fountain | Plug-In Model (PLWF106) 
+* Dockstream 2 Smart Fountain | Cordless Model (PLWF116)
 
 ### Some Devices / May or may not work as intended
 
