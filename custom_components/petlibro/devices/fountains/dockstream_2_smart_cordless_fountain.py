@@ -120,7 +120,7 @@ class Dockstream2SmartCordlessFountain(Device):
     @property
     def water_state(self) -> bool:
         """Check if water switch is on."""
-        return self._data.get("dataRealInfo", {}).get("waterStopSwitch", False)
+        return not self._data.get("dataRealInfo", {}).get("waterStopSwitch", False)
 
     @property
     def water_dispensing_mode(self) -> str:
