@@ -57,8 +57,8 @@ async def _apply_with_cached_schedule(device, builder):
     then refresh the device.
     """
     interval, duration = await _current_schedule(device)
-    currently_off = bool(getattr(device, "water_switch", False))
-    return await _apply_and_refresh(device, builder(interval, duration, currently_off))
+    off = bool(getattr(device, "water_switch", False))
+    return await _apply_and_refresh(device, builder(interval, duration, off))
 
 @dataclass(frozen=True)
 class PetLibroSelectEntityDescription(SelectEntityDescription, PetLibroEntityDescription[_DeviceT]):
