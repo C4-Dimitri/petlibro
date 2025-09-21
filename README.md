@@ -95,10 +95,4 @@ Get the folder `custom_components/petlibro` in your HA `config/custom_components
 
 ## Star History
 
-<a href="https://www.star-history.com/#jjjonesjr33/petlibro&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date" />
- </picture>
-</a>
+[![Star History Chart](https://api.star-history.com/svg?repos=jjjonesjr33/petlibro&type=Date&theme=dark)](https://www.star-history.com/#jjjonesjr33/petlibro&Date)
