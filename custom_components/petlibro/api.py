@@ -832,15 +832,26 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set OFF for {serial}: {e}")
             raise
 
-    async def set_water_mode_radar_near(self, serial: str, interval: int, duration: int | None = None):
-        """Sensed (Near): set radar to NearTrigger, then useWaterType=2."""
-        _LOGGER.debug(f"set_water_mode_radar_near: serial={serial}")
+    async def set_water_mode_on(self, serial: str):
+        """ON: stop switch OFF (False = on)."""
+        _LOGGER.debug(f"set_water_mode_on: serial={serial}")
         try:
             resp = await self.session.post("/device/device/waterModeSetting", json={
                 "deviceSn": serial,
                 "waterStopSwitch": False,
             })
             _LOGGER.debug(f"ON set successfully: {resp}")
+            return resp
+        except Exception as e:
+            _LOGGER.error(f"Failed to set ON for {serial}: {e}")
+            raise
+
+    async def set_water_mode_radar_near(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
+        """Sensed (Near): set radar to NearTrigger, then useWaterType=2."""
+        _LOGGER.debug(f"set_water_mode_radar_near: serial={serial}")
+        try:
+            if currently_off:
+                await self.set_water_mode_on(serial)
 
             radar_resp = await self.session.post("/device/setting/updateRadarSetting", json={
                 "deviceSn": serial,
@@ -862,15 +873,12 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set Sensed Near for {serial}: {e}")
             raise
 
-    async def set_water_mode_radar_far(self, serial: str, interval: int, duration: int | None = None):
+    async def set_water_mode_radar_far(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
         """Sensed (Far): set radar to FarTrigger, then useWaterType=2."""
         _LOGGER.debug(f"set_water_mode_radar_far: serial={serial}")
         try:
-            resp = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "waterStopSwitch": False,
-            })
-            _LOGGER.debug(f"ON set successfully: {resp}")
+            if currently_off:
+                await self.set_water_mode_on(serial)
 
             radar_resp = await self.session.post("/device/setting/updateRadarSetting", json={
                 "deviceSn": serial,
@@ -892,15 +900,12 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set Sensed Far for {serial}: {e}")
             raise
 
-    async def set_new_water_mode_intermittent(self, serial: str, interval: int, duration: int  | None = None):
+    async def set_new_water_mode_intermittent(self, serial: str, interval: int, duration: int  | None = None, *, currently_off: bool | None = None):
         """Intermittent (Scheduled): useWaterType=1; """
         _LOGGER.debug(f"set_water_mode_intermittent: serial={serial}")
         try:
-            resp = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "waterStopSwitch": False,
-            })
-            _LOGGER.debug(f"ON set successfully: {resp}")
+            if currently_off:
+                await self.set_water_mode_on(serial)
 
             request_id = str(uuid.uuid4()).replace("-", "")
             resp = await self.session.post("/device/device/waterModeSetting", json={
@@ -916,15 +921,12 @@ class PetLibroAPI:
             _LOGGER.error(f"Failed to set Intermittent for {serial}: {e}")
             raise
 
-    async def set_new_water_mode_constant(self, serial: str, interval: int, duration: int | None = None):
+    async def set_new_water_mode_constant(self, serial: str, interval: int, duration: int | None = None, *, currently_off: bool | None = None):
         """Constant: useWaterType=0."""
         _LOGGER.debug(f"set_water_mode_constant: serial={serial}")
         try:
-            resp = await self.session.post("/device/device/waterModeSetting", json={
-                "deviceSn": serial,
-                "waterStopSwitch": False,
-            })
-            _LOGGER.debug(f"ON set successfully: {resp}")
+            if currently_off:
+                await self.set_water_mode_on(serial)
 
             request_id = str(uuid.uuid4()).replace("-", "")
             resp = await self.session.post("/device/device/waterModeSetting", json={
