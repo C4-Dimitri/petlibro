@@ -57,7 +57,8 @@ async def _apply_with_cached_schedule(device, builder):
     then refresh the device.
     """
     interval, duration = await _current_schedule(device)
-    off = bool(getattr(device, "water_state", False))
+    on = bool(getattr(device, "water_state", False))
+    off = not on
     return await _apply_and_refresh(device, builder(interval, duration, off))
 
 @dataclass(frozen=True)
