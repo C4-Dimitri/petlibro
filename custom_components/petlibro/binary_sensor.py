@@ -495,7 +495,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             translation_key="water_state",
             icon="mdi:water",
             device_class=BinarySensorDeviceClass.MOISTURE,
-            should_report=lambda device: device.water_switch is not None,
+            should_report=lambda device: device.water_state is not None,
             name="Water Dispensing State"
         ),
     ],
@@ -520,7 +520,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             translation_key="water_state",
             icon="mdi:water",
             device_class=BinarySensorDeviceClass.MOISTURE,
-            should_report=lambda device: device.water_switch is not None,
+            should_report=lambda device: device.water_state is not None,
             name="Water Dispensing State"
         ),
     ]

@@ -106,8 +106,8 @@ class Dockstream2SmartFountain(Device):
         await self.refresh()
 
     @property
-    def water_switch(self) -> bool:
-        """Check if water switch is on."""
+    def water_state(self) -> bool:
+        """Check if water stop switch is on."""
         return self._data.get("dataRealInfo", {}).get("waterStopSwitch", False)
 
     @property
