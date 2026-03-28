@@ -1,0 +1,235 @@
+enable_feeding_plan:
+  name: Enable Feeding Plan
+  description: Enable a specific scheduled feeding plan on a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of the feeding plan to enable (visible in the feeder's sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+
+disable_feeding_plan:
+  name: Disable Feeding Plan
+  description: Disable a specific scheduled feeding plan on a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of the feeding plan to disable (visible in the feeder's sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+
+delete_feeding_plan:
+  name: Delete Feeding Plan
+  description: Permanently delete a specific scheduled feeding plan from a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of the feeding plan to delete (visible in the feeder's sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+
+edit_feeding_plan:
+  name: Edit Feeding Plan
+  description: Edit the details of an existing scheduled feeding plan on a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of the feeding plan to edit (visible in the feeder's sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+    time:
+      name: Time
+      description: "New feed time in HH:MM format (e.g. 08:00)."
+      required: false
+      selector:
+        time:
+    portions:
+      name: Portions
+      description: Number of portions to dispense (1–48).
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 48
+          mode: slider
+    label:
+      name: Label
+      description: A name for this feeding plan (e.g. "Morning feed").
+      required: false
+      selector:
+        text:
+    days:
+      name: Repeat Days
+      description: Days of the week to repeat.
+      required: false
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Monday
+              value: "1"
+            - label: Tuesday
+              value: "2"
+            - label: Wednesday
+              value: "3"
+            - label: Thursday
+              value: "4"
+            - label: Friday
+              value: "5"
+            - label: Saturday
+              value: "6"
+            - label: Sunday
+              value: "7"
+    sound:
+      name: Meal Call Sound
+      description: Play the meal call sound when dispensing.
+      required: false
+      selector:
+        boolean:
+
+add_feeding_plan:
+  name: Add Feeding Plan
+  description: Add a new scheduled feeding plan to a dry food feeder.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    time:
+      name: Time
+      description: "Feed time in HH:MM format (e.g. 08:00)."
+      required: true
+      selector:
+        time:
+    portions:
+      name: Portions
+      description: Number of portions to dispense (1–48).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 48
+          mode: slider
+    label:
+      name: Label
+      description: A name for this feeding plan (e.g. "Morning feed").
+      required: false
+      selector:
+        text:
+    days:
+      name: Repeat Days
+      description: Days of the week to repeat. Leave empty for a one-time feed.
+      required: false
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Monday
+              value: "1"
+            - label: Tuesday
+              value: "2"
+            - label: Wednesday
+              value: "3"
+            - label: Thursday
+              value: "4"
+            - label: Friday
+              value: "5"
+            - label: Saturday
+              value: "6"
+            - label: Sunday
+              value: "7"
+    sound:
+      name: Meal Call Sound
+      description: Play the meal call sound when dispensing.
+      required: false
+      selector:
+        boolean:
+
+enable_today_feeding_plan:
+  name: Enable Today's Feeding Plan
+  description: Un-skip a specific feeding plan event for today only.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of today's feeding plan event to enable (visible in the Today's Feeding Plan sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
+
+disable_today_feeding_plan:
+  name: Disable Today's Feeding Plan
+  description: Skip a specific feeding plan event for today only.
+  fields:
+    device_id:
+      name: Device
+      description: The feeder to target.
+      required: true
+      selector:
+        device:
+          integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: The ID of today's feeding plan event to skip (visible in the Today's Feeding Plan sensor attributes).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box

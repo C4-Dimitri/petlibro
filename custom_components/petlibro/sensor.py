@@ -287,6 +287,23 @@ class PetLibroSensorEntity(PetLibroEntity[_DeviceT], SensorEntity):
                     unit.symbol: VolumeConverter.convert(getattr(self.device, key, 0), UnitOfVolume.MILLILITERS, unit.symbol)
                     for unit in VALID_UNIT_TYPES[API.WATER_UNIT] if unit
                 }                
+            case "feeding_schedule":
+                plans = self.device.feeding_plan_data  # dict keyed by plan_id str
+                unit = self.member.feedUnitType
+                weight = unit if unit in (Unit.GRAMS, Unit.OUNCES) else Unit.GRAMS
+                volume = unit if unit in (Unit.MILLILITERS, Unit.CUPS) else Unit.MILLILITERS
+                return {
+                    plan.get("label") or f"plan_{plan_id}": {
+                        "planID": int(plan_id),
+                        "time": plan.get("executionTime"),
+                        "amount (weight)": f"{Unit.convert_feed(plan.get('grainNum', 0) * self.device.feed_conv_factor, None, weight, True)} {weight.symbol}",
+                        "amount (volume)": f"{Unit.convert_feed(plan.get('grainNum', 0) * self.device.feed_conv_factor, None, volume, True)} {volume.symbol}",
+                        "enabled": plan.get("enable", False),
+                        "repeat_days": plan.get("repeatDay", "[]"),
+                        "sound": plan.get("enableAudio", False),
+                    }
+                    for plan_id, plan in plans.items()
+                } or {}
         return super().extra_state_attributes
 
 DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
@@ -409,6 +426,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:lock",
             name="Buttons Lock"
         ),
+        PetLibroSensorEntityDescription[AirSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule",
+            should_report=lambda device: bool(device.feeding_plan_data),
+        )
     ],
     GranarySmartFeeder: [
         PetLibroSensorEntityDescription[GranarySmartFeeder](
@@ -536,6 +560,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:lock",
             name="Buttons Lock"
         ),
+        PetLibroSensorEntityDescription[GranarySmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule",
+            should_report=lambda device: bool(device.feeding_plan_data),
+        )
     ],
     GranarySmartCameraFeeder: [
         PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
@@ -698,6 +729,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             name="Video Recording Mode",
             should_report=lambda device: device.video_record_mode is not None  # Corrected name
         ),
+        PetLibroSensorEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule",
+            should_report=lambda device: bool(device.feeding_plan_data),
+        )
     ],
     OneRFIDSmartFeeder: [
         PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
@@ -838,6 +876,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:monitor-shimmer",
             name="Display Value"
         ),
+        PetLibroSensorEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule",
+            should_report=lambda device: bool(device.feeding_plan_data),
+        )
     ],
     PolarWetFoodFeeder: [
         PetLibroSensorEntityDescription[PolarWetFoodFeeder](
@@ -1033,6 +1078,13 @@ DEVICE_SENSOR_MAP: dict[type[Device], list[PetLibroSensorEntityDescription]] = {
             icon="mdi:air-filter",
             name="Vacuum Mode"
         ),
+        PetLibroSensorEntityDescription[SpaceSmartFeeder](
+            key="feeding_schedule",
+            translation_key="feeding_schedule",
+            icon="mdi:calendar-clock",
+            name="Feeding Schedule",
+            should_report=lambda device: bool(device.feeding_plan_data),
+        )
     ],
     DockstreamSmartFountain: [
         PetLibroSensorEntityDescription[DockstreamSmartFountain](
