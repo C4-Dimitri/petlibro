@@ -9,6 +9,14 @@ enable_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Schedule Reference
+      description: "Open this sensor to view all plan IDs and labels — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of the feeding plan to enable (visible in the Feeding Schedule sensor attributes).
@@ -30,6 +38,14 @@ disable_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Schedule Reference
+      description: "Open this sensor to view all plan IDs and labels — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of the feeding plan to disable (visible in the Feeding Schedule sensor attributes).
@@ -51,6 +67,14 @@ delete_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Schedule Reference
+      description: "Open this sensor to view all plan IDs and labels — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of the feeding plan to delete (visible in the Feeding Schedule sensor attributes).
@@ -72,6 +96,14 @@ edit_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Schedule Reference
+      description: "Open this sensor to view all plan IDs and labels — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of the feeding plan to edit (visible in the Feeding Schedule sensor attributes).
@@ -98,8 +130,9 @@ edit_feeding_plan:
           mode: slider
     label:
       name: Label
-      description: A name for this feeding plan (e.g. "Morning feed").
+      description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
       required: false
+      example: "MorningFeed"
       selector:
         text:
     days:
@@ -159,7 +192,7 @@ add_feeding_plan:
           mode: slider
     label:
       name: Label
-      description: A name for this feeding plan. No spaces allowed (e.g. "MorningFeed").
+      description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
       required: false
       example: "MorningFeed"
       selector:
@@ -204,6 +237,14 @@ enable_today_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Today's Schedule Reference
+      description: "Open this sensor to view today's plan IDs — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of today's feeding plan event to enable (visible in the Today's Feeding Plan sensor attributes).
@@ -225,6 +266,14 @@ disable_today_feeding_plan:
       selector:
         device:
           integration: petlibro
+    schedule_reference:
+      name: Today's Schedule Reference
+      description: "Open this sensor to view today's plan IDs — then enter the ID below."
+      required: false
+      selector:
+        entity:
+          integration: petlibro
+          domain: sensor
     plan_id:
       name: Plan ID
       description: The ID of today's feeding plan event to skip (visible in the Today's Feeding Plan sensor attributes).
