@@ -60,9 +60,9 @@ def _get_feeder(hass: HomeAssistant, device_id: str):
             return device
 
     raise ServiceValidationError(
-        f"No loaded PetLibro device found for serial {serial}."
+        f"Device not found or is not a feeder. "
+        "Please select a dry food feeder, NOT a pet, fountain, wet food feeder or litter box."
     )
-
 
 def _get_plan_id_for_device(hass: HomeAssistant, device_id: str, select_key: str) -> int:
     """Find the feeding plan select entity for this device and extract the
