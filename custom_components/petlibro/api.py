@@ -1545,7 +1545,7 @@ class PetLibroAPI:
             "label": plan.get("label", ""),
             "enable": True,
             "enableAudio": plan.get("enableAudio", False),
-            "audioTimes": 1,
+            "audioTimes": 2,
             "grainNum": plan.get("grainNum"),
             "petIds": [],
         })
@@ -1568,7 +1568,7 @@ class PetLibroAPI:
             "label": plan.get("label", ""),
             "enable": plan.get("enable", True),
             "enableAudio": plan.get("enableAudio", False),
-            "audioTimes": plan.get("audioTimes", 1),
+            "audioTimes": plan.get("audioTimes", 2),
             "grainNum": plan.get("grainNum"),
             "petIds": [],
         })

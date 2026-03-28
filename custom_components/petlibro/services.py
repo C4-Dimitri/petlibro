@@ -127,7 +127,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         # Start from the existing plan so unspecified fields keep their values
         payload: dict[str, Any] = {**existing, "id": plan_id}
         if (v := call.data.get(_TIME)) is not None:
-            payload["executionTime"] = v
+            payload["executionTime"] = v[:5]  # strip seconds → "HH:MM"
         if (v := call.data.get(_PORTIONS)) is not None:
             payload["grainNum"] = v
         if (v := call.data.get(_LABEL)) is not None:
@@ -150,7 +150,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         device = _get_feeder(hass, call.data[_DEVICE_ID])
 
         payload: dict[str, Any] = {
-            "executionTime": call.data[_TIME],
+            "executionTime": call.data[_TIME][:5],  # strip seconds → "HH:MM"
             "grainNum": call.data[_PORTIONS],
             "label": call.data.get(_LABEL, ""),
             "repeatDay": "[" + ",".join(str(int(d)) for d in call.data.get(_DAYS, [])) + "]",

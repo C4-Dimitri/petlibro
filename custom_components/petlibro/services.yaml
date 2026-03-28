@@ -163,6 +163,7 @@ add_feeding_plan:
       required: false
       selector:
         text:
+          pattern: "^[^\\s]+$"
     days:
       name: Repeat Days
       description: Days of the week to repeat. Leave empty for a one-time feed.
