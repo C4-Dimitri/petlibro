@@ -149,6 +149,12 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     async def handle_add_feeding_plan(call: ServiceCall) -> None:
         device = _get_feeder(hass, call.data[_DEVICE_ID])
 
+        if (label := call.data.get(_LABEL, "")):
+            if " " in label:
+                raise ServiceValidationError(
+                    "Label cannot contain spaces. Use something like 'MorningFeed' instead."
+                )
+
         payload: dict[str, Any] = {
             "executionTime": call.data[_TIME][:5],  # strip seconds → "HH:MM"
             "grainNum": call.data[_PORTIONS],

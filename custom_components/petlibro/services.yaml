@@ -159,11 +159,11 @@ add_feeding_plan:
           mode: slider
     label:
       name: Label
-      description: A name for this feeding plan (e.g. "Morning feed").
+      description: A name for this feeding plan. No spaces allowed (e.g. "MorningFeed").
       required: false
+      example: "MorningFeed"
       selector:
         text:
-          pattern: "^[^\\s]+$"
     days:
       name: Repeat Days
       description: Days of the week to repeat. Leave empty for a one-time feed.
