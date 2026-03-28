@@ -35,31 +35,22 @@ _SOUND      = "sound"
 
 
 def _get_feeder(hass: HomeAssistant, device_id: str) -> Feeder:
-    """Resolve a HA device_id to a PetLibro Feeder instance.
-
-    Raises ServiceValidationError if the device is not found or is not a
-    dry-food feeder (i.e. does not have feeding_plan_data).
-    """
     dev_reg = dr.async_get(hass)
     device_entry = dev_reg.async_get(device_id)
     if not device_entry:
         raise ServiceValidationError(f"Device {device_id} not found.")
 
-    # Find the serial number from the device identifiers
     serial = next(
         (identifier[1] for identifier in device_entry.identifiers if identifier[0] == DOMAIN),
         None,
     )
     if not serial:
-        raise ServiceValidationError(
-            f"Device {device_id} is not a PETLIBRO device."
-        )
+        raise ServiceValidationError(f"Device {device_id} is not a PETLIBRO device.")
 
-    # Walk every hub entry to find the matching device
-    for entry_id, hub in hass.data.get(DOMAIN, {}).items():
+    for _, hub in hass.data.get(DOMAIN, {}).items():
         device = hub.devices.get(serial)
         if device is not None:
-            if not isinstance(device, Feeder) or not hasattr(device, "feeding_plan_data"):
+            if not hasattr(device, "feeding_plan_data"):
                 raise ServiceValidationError(
                     f"{device.name} does not support feeding plan services. "
                     "Only dry food feeders are supported."
@@ -69,7 +60,6 @@ def _get_feeder(hass: HomeAssistant, device_id: str) -> Feeder:
     raise ServiceValidationError(
         f"No loaded PetLibro device found for serial {serial}."
     )
-
 
 def _build_plan_payload(
     device: Feeder,
