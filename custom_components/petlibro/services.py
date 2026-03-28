@@ -23,13 +23,16 @@ SERVICE_ENABLE_TODAY_FEEDING_PLAN  = "enable_today_feeding_plan"
 SERVICE_DISABLE_TODAY_FEEDING_PLAN = "disable_today_feeding_plan"
 
 # Field keys
-_DEVICE_ID   = "device_id"
-_PLAN_ENTITY = "plan_entity"
-_TIME        = "time"
-_PORTIONS    = "portions"
-_LABEL       = "label"
-_DAYS        = "days"
-_SOUND       = "sound"
+_DEVICE_ID = "device_id"
+_TIME      = "time"
+_PORTIONS  = "portions"
+_LABEL     = "label"
+_DAYS      = "days"
+_SOUND     = "sound"
+
+# Keys used by the feeding plan select entities in select.py
+_SELECT_KEY_SCHEDULE = "feeding_plan_select"
+_SELECT_KEY_TODAY    = "feeding_plan_today_select"
 
 
 def _get_feeder(hass: HomeAssistant, device_id: str):
@@ -61,26 +64,44 @@ def _get_feeder(hass: HomeAssistant, device_id: str):
     )
 
 
-def _get_plan_id_from_entity(hass: HomeAssistant, entity_id: str) -> int:
-    """Read the currently selected option from a feeding plan select entity
-    and extract the plan ID from the 'Label - ID' format.
+def _get_plan_id_for_device(hass: HomeAssistant, device_id: str, select_key: str) -> int:
+    """Find the feeding plan select entity for this device and extract the
+    currently selected plan ID from its state.
 
-    Raises ServiceValidationError if the entity state is invalid.
+    select_key is either 'feeding_plan_select' (full schedule) or
+    'feeding_plan_today_select' (today only).
     """
-    state = hass.states.get(entity_id)
+    ent_reg = er.async_get(hass)
+
+    # Find the select entity that belongs to this HA device and has the right key
+    entity_entry = next(
+        (
+            e for e in er.async_entries_for_device(ent_reg, device_id)
+            if e.domain == "select" and e.unique_id and e.unique_id.endswith(f"-{select_key}")
+        ),
+        None,
+    )
+
+    if not entity_entry:
+        raise ServiceValidationError(
+            f"No '{select_key}' entity found for this device. "
+            "Make sure the integration has loaded correctly."
+        )
+
+    state = hass.states.get(entity_entry.entity_id)
     if not state:
         raise ServiceValidationError(
-            f"Could not read entity {entity_id}. Make sure the feeder is online."
+            f"Could not read state of {entity_entry.entity_id}. "
+            "Make sure the feeder is online."
         )
 
     option = state.state
     if not option or option in ("unknown", "unavailable", "No plans", "No plans today"):
         raise ServiceValidationError(
-            f"No plan is selected on {entity_id}. "
-            "Select a plan from the dropdown first."
+            f"No plan is selected on {entity_entry.entity_id}. "
+            "Select a plan from the feeder's feeding plan dropdown first."
         )
 
-    # Options are formatted as "Label - 3907147"
     match = re.search(r"-\s*(\d+)\s*$", option)
     if not match:
         raise ServiceValidationError(
@@ -100,8 +121,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # enable_feeding_plan
     # ------------------------------------------------------------------
     async def handle_enable_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_SCHEDULE)
 
         existing = device.feeding_plan_data.get(str(plan_id), {})
         await device.api.feeding_plan_toggle(device.serial, {**existing, "id": plan_id, "enable": True})
@@ -114,8 +136,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # disable_feeding_plan
     # ------------------------------------------------------------------
     async def handle_disable_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_SCHEDULE)
 
         existing = device.feeding_plan_data.get(str(plan_id), {})
         await device.api.feeding_plan_toggle(device.serial, {**existing, "id": plan_id, "enable": False})
@@ -128,8 +151,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # delete_feeding_plan
     # ------------------------------------------------------------------
     async def handle_delete_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_SCHEDULE)
 
         await device.api.feeding_plan_delete(device.serial, plan_id)
         await device.refresh()
@@ -141,8 +165,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # edit_feeding_plan
     # ------------------------------------------------------------------
     async def handle_edit_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_SCHEDULE)
 
         existing = device.feeding_plan_data.get(str(plan_id))
         if not existing:
@@ -204,8 +229,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # enable_today_feeding_plan
     # ------------------------------------------------------------------
     async def handle_enable_today_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_TODAY)
 
         await device.api.feeding_plan_today_skip(device.serial, plan_id, skip=False)
         await device.refresh()
@@ -219,8 +245,9 @@ async def async_setup_services(hass: HomeAssistant) -> None:
     # disable_today_feeding_plan
     # ------------------------------------------------------------------
     async def handle_disable_today_feeding_plan(call: ServiceCall) -> None:
-        device = _get_feeder(hass, call.data[_DEVICE_ID])
-        plan_id = _get_plan_id_from_entity(hass, call.data[_PLAN_ENTITY])
+        device_id = call.data[_DEVICE_ID]
+        device = _get_feeder(hass, device_id)
+        plan_id = _get_plan_id_for_device(hass, device_id, _SELECT_KEY_TODAY)
 
         await device.api.feeding_plan_today_skip(device.serial, plan_id, skip=True)
         await device.refresh()
