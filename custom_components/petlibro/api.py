@@ -1520,56 +1520,58 @@ class PetLibroAPI:
 
         return success
 
-    async def feeding_plan_update(self, serial: str, plan: dict) -> None:
-        """Enable, disable, or edit an existing feeding plan.
- 
-        :param serial: Device serial number.
-        :param plan:   Full plan dict (id required). Missing fields keep their
-                       current values — callers should merge from feeding_plan_data
-                       before calling. The 'enable' field controls on/off.
-        """
-        await self.session.post("/device/feedingPlan/update", json={
+    async def feeding_plan_toggle(self, serial: str, plan: dict) -> None:
+        """Enable or disable an existing feeding plan via the /enable endpoint."""
+        await self.session.post("/device/feedingPlan/enable", json={
             "deviceSn": serial,
-            "plan": plan,
-        })
- 
-    async def feeding_plan_delete(self, serial: str, plan_id: int) -> None:
-        """Permanently delete a feeding plan.
- 
-        :param serial:  Device serial number.
-        :param plan_id: The plan's integer ID.
-        """
-        await self.session.post("/device/feedingPlan/delete", json={
-            "deviceSn": serial,
-            "id": plan_id,
-        })
- 
-    async def feeding_plan_add(self, serial: str, plan: dict) -> None:
-        """Create a new feeding plan.
- 
-        :param serial: Device serial number.
-        :param plan:   Plan dict without 'id' (the API assigns a new one).
-                       Required fields: executionTime, grainNum.
-                       Optional: label, repeatDay, enableAudio, enable.
-        """
-        await self.session.post("/device/feedingPlan/save", json={
-            "deviceSn": serial,
-            "plan": plan,
-        })
- 
-    async def feeding_plan_today_skip(self, serial: str, plan_id: int, skip: bool) -> None:
-        """Skip or un-skip a single feeding plan event for today only.
- 
-        :param serial:  Device serial number.
-        :param plan_id: The planId from the todayNew response.
-        :param skip:    True to skip (disable), False to un-skip (enable).
-        """
-        await self.session.post("/device/feedingPlan/skipPlanToday", json={
-            "deviceSn": serial,
-            "planId": plan_id,
-            "skip": skip,
+            "planId": plan["id"],
+            "enable": plan["enable"],
         })
 
+    async def feeding_plan_delete(self, serial: str, plan_id: int) -> None:
+        """Permanently remove a feeding plan."""
+        await self.session.post("/device/feedingPlan/remove", json={
+            "deviceSn": serial,
+            "planId": plan_id,
+        })
+
+    async def feeding_plan_add(self, serial: str, plan: dict) -> None:
+        """Create a new feeding plan."""
+        await self.session.post("/device/feedingPlan/add", json={
+            "id": 0,
+            "deviceSn": serial,
+            "executionTime": plan.get("executionTime"),
+            "repeatDay": plan.get("repeatDay", "[]"),
+            "label": plan.get("label", ""),
+            "enable": True,
+            "enableAudio": plan.get("enableAudio", False),
+            "audioTimes": 1,
+            "grainNum": plan.get("grainNum"),
+            "petIds": [],
+        })
+
+    async def feeding_plan_today_skip(self, serial: str, plan_id: int, skip: bool) -> None:
+        """Skip or un-skip a single feeding plan event for today only."""
+        await self.session.post("/device/feedingPlan/enableTodaySingle", json={
+            "deviceSn": serial,
+            "planId": plan_id,
+            "enable": not skip,
+        })
+        
+    async def feeding_plan_update(self, serial: str, plan: dict) -> None:
+        """Enable, disable, or edit an existing feeding plan."""
+        await self.session.post("/device/feedingPlan/update", json={
+            "id": plan["id"],
+            "deviceSn": serial,
+            "executionTime": plan.get("executionTime"),
+            "repeatDay": plan.get("repeatDay", "[]"),
+            "label": plan.get("label", ""),
+            "enable": plan.get("enable", True),
+            "enableAudio": plan.get("enableAudio", False),
+            "audioTimes": plan.get("audioTimes", 1),
+            "grainNum": plan.get("grainNum"),
+            "petIds": [],
+        })
 
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):

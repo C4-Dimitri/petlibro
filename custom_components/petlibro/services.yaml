@@ -11,7 +11,7 @@ enable_feeding_plan:
           integration: petlibro
     plan_id:
       name: Plan ID
-      description: The ID of the feeding plan to enable (visible in the feeder's sensor attributes).
+      description: The ID of the feeding plan to enable (visible in the Feeding Schedule sensor attributes).
       required: true
       selector:
         number:
@@ -32,7 +32,7 @@ disable_feeding_plan:
           integration: petlibro
     plan_id:
       name: Plan ID
-      description: The ID of the feeding plan to disable (visible in the feeder's sensor attributes).
+      description: The ID of the feeding plan to disable (visible in the Feeding Schedule sensor attributes).
       required: true
       selector:
         number:
@@ -53,7 +53,7 @@ delete_feeding_plan:
           integration: petlibro
     plan_id:
       name: Plan ID
-      description: The ID of the feeding plan to delete (visible in the feeder's sensor attributes).
+      description: The ID of the feeding plan to delete (visible in the Feeding Schedule sensor attributes).
       required: true
       selector:
         number:
@@ -63,7 +63,7 @@ delete_feeding_plan:
 
 edit_feeding_plan:
   name: Edit Feeding Plan
-  description: Edit the details of an existing scheduled feeding plan on a dry food feeder.
+  description: Edit the details of an existing scheduled feeding plan. Only the fields you provide will be changed — anything left blank keeps its current value.
   fields:
     device_id:
       name: Device
@@ -74,7 +74,7 @@ edit_feeding_plan:
           integration: petlibro
     plan_id:
       name: Plan ID
-      description: The ID of the feeding plan to edit (visible in the feeder's sensor attributes).
+      description: The ID of the feeding plan to edit (visible in the Feeding Schedule sensor attributes).
       required: true
       selector:
         number:
@@ -104,7 +104,7 @@ edit_feeding_plan:
         text:
     days:
       name: Repeat Days
-      description: Days of the week to repeat.
+      description: Days of the week to repeat. Leave empty to keep existing days.
       required: false
       selector:
         select:
