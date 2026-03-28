@@ -133,7 +133,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         if (v := call.data.get(_LABEL)) is not None:
             payload["label"] = v
         if (v := call.data.get(_DAYS)) is not None:
-            payload["repeatDay"] = str([int(d) for d in v])
+            payload["repeatDay"] = "[" + ",".join(str(int(d)) for d in v) + "]"
         if (v := call.data.get(_SOUND)) is not None:
             payload["enableAudio"] = v
 
@@ -153,7 +153,7 @@ async def async_setup_services(hass: HomeAssistant) -> None:
             "executionTime": call.data[_TIME],
             "grainNum": call.data[_PORTIONS],
             "label": call.data.get(_LABEL, ""),
-            "repeatDay": str([int(d) for d in call.data.get(_DAYS, [])]),
+            "repeatDay": "[" + ",".join(str(int(d)) for d in call.data.get(_DAYS, [])) + "]",
             "enableAudio": call.data.get(_SOUND, False),
         }
         await device.api.feeding_plan_add(device.serial, payload)
