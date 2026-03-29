@@ -189,7 +189,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Today's Feeding Schedule"
         ),
@@ -197,7 +196,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -254,7 +252,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Today's Feeding Schedule"
         ),
@@ -262,7 +259,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -319,7 +315,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Today's Feeding Schedule"
         ),
@@ -327,7 +322,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -415,7 +409,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Today's Feeding Schedule"
         ),
@@ -423,7 +416,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
@@ -480,7 +472,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Feeding Plan"
         ),
@@ -559,7 +550,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_plan_state",
             translation_key="feeding_plan_state",
             icon="mdi:calendar-check",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
             name="Today's Feeding Schedule"
         ),
@@ -567,7 +557,6 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             key="feeding_schedule",
             translation_key="feeding_schedule",
             icon="mdi:calendar-clock",
-            device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: bool(getattr(device, "feeding_plan_data", {})),
             value_fn=lambda device: device.feeding_plan_state,
             name="Feeding Schedule"
