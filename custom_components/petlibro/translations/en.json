@@ -317,10 +317,10 @@
                 "name": "Manual Cleaning"
             },
             "enable_feeding_plan": {
-                "name": "Enable Feeding Plan"
+                "name": "Enable Feeding Schedule"
             },
             "disable_feeding_plan": {
-                "name": "Disable Feeding Plan"
+                "name": "Disable Feeding Schedule"
             },
             "manual_lid_open": {
                 "name": "Manually Open Lid"

@@ -53,8 +53,6 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
     plan_fn: Callable | None = None
 
 
-
-
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
     ],
