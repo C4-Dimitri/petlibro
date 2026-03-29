@@ -433,7 +433,7 @@
                 "name": "Feeding Plan"
             },
             "feeding_schedule": {
-                "name": "Feeding Schedule"
+                "name": "Today's Feeding Schedule"
             }
         },
         "number": {
