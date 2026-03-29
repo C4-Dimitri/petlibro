@@ -5,7 +5,7 @@ from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Generic
 from logging import getLogger
 from .const import DOMAIN
@@ -15,8 +15,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
-from .hub import PetLibroHub  # Adjust the import path as necessary
+from homeassistant.config_entries import ConfigEntry
+from .hub import PetLibroHub
 
 _LOGGER = getLogger(__name__)
 
@@ -36,19 +36,93 @@ from .devices.fountains.dockstream_2_smart_cordless_fountain import Dockstream2S
 from .devices.fountains.dockstream_2_smart_fountain import Dockstream2SmartFountain
 from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 
+
 @dataclass(frozen=True)
 class RequiredKeysMixin(Generic[_DeviceT]):
     """A class that describes devices button entity required keys."""
-    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]]
+    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]] = field(default=lambda _: None)
 
 
 @dataclass(frozen=True)
 class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT], RequiredKeysMixin[_DeviceT]):
     """A class that describes device button entities."""
     entity_category: EntityCategory = EntityCategory.CONFIG
+    # For feeding plan buttons: read plan_id from this select entity unique_id suffix
+    select_key: str | None = None
+    # Async callable(device, plan_id) — used when select_key is set
+    plan_fn: Callable | None = None
 
 
-# Map buttons to their respective device types
+# ---------------------------------------------------------------------------
+# Feeding plan button helpers shared across dry feeders
+# ---------------------------------------------------------------------------
+
+def _plan_enable_buttons(device_type):
+    """Return the 7 feeding plan buttons for a dry feeder type."""
+    return [
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable All Plans Today",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[device_type](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable All Plans Today",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
+    ]
+
+
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     Feeder: [
     ],
@@ -83,6 +157,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
+        *_plan_enable_buttons(AirSmartFeeder),
     ],
     GranarySmartFeeder: [
         PetLibroButtonEntityDescription[GranarySmartFeeder](
@@ -121,6 +196,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         ),
+        *_plan_enable_buttons(GranarySmartFeeder),
     ],
     GranarySmartCameraFeeder: [
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
@@ -159,6 +235,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         ),
+        *_plan_enable_buttons(GranarySmartCameraFeeder),
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -214,7 +291,8 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             translation_key="desiccant_reset",
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Reset"
-        )
+        ),
+        *_plan_enable_buttons(OneRFIDSmartFeeder),
     ],
     PolarWetFoodFeeder: [
         PetLibroButtonEntityDescription[PolarWetFoodFeeder](
@@ -303,6 +381,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_sleep_off(),
             name="Turn Off Sleep Mode"
         ),
+        *_plan_enable_buttons(SpaceSmartFeeder),
     ],
     DockstreamSmartFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartFountain](
@@ -464,50 +543,10 @@ class PetLibroButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
         """Check if the device is available."""
         return getattr(self.device, 'online', False)
 
-    async def async_press(self) -> None:
-        """Handle the button press."""
-        _LOGGER.debug("Pressing button: %s for device %s", self.entity_description.name, self.device.name)
-        _LOGGER.debug("Available methods for device %s: %s", self.device.name, dir(self.device))
-
-        try:
-            await self.entity_description.set_fn(self.device)
-            await self.device.refresh()
-            _LOGGER.debug("Successfully pressed button: %s", self.entity_description.name)
-        except Exception as e:
-            _LOGGER.error(
-                f"Error pressing button {self.entity_description.name} for device {self.device.name}: {e}",
-                exc_info=True
-            )
-
-class FeedingPlanButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
-    """Button that acts on whichever feeding plan is currently selected in
-    the companion select entity.
-
-    action_fn:  async callable(device, plan_id) — the API action to perform.
-    select_key: unique_id suffix of the select entity to read from,
-                either 'feeding_plan_select' or 'feeding_plan_today_select'.
-    """
-
-    _attr_entity_category = EntityCategory.CONFIG
-
-    def __init__(self, device, hub, key: str, name: str, icon: str,
-                 action_fn, select_key: str) -> None:
-        desc = PetLibroEntityDescription(key=key, name=name)
-        super().__init__(device, hub, desc)
-        self._attr_unique_id = f"{device.serial}-{key}"
-        self._attr_icon = icon
-        self._action_fn = action_fn
-        self._select_key = select_key
-
-    @property
-    def available(self) -> bool:
-        """Check if the device is available."""
-        return getattr(self.device, 'online', False)
-
-    def _get_plan_id(self) -> int:
+    def _get_plan_id(self, select_key: str) -> int:
         """Read the currently selected plan ID from the companion select entity."""
         ent_reg = er.async_get(self.hass)
-        unique_id = f"{self.device.serial}-{self._select_key}"
+        unique_id = f"{self.device.serial}-{select_key}"
         entity_id = ent_reg.async_get_entity_id("select", DOMAIN, unique_id)
 
         if not entity_id:
@@ -532,21 +571,33 @@ class FeedingPlanButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
         return int(match.group(1))
 
     async def async_press(self) -> None:
-        """Handle button press — act on the currently selected plan."""
+        """Handle the button press."""
+        desc = self.entity_description
+        _LOGGER.debug("Pressing button: %s for device %s", desc.name, self.device.name)
+
         try:
-            plan_id = self._get_plan_id()
-            await self._action_fn(self.device, plan_id)
+            if desc.select_key and desc.plan_fn:
+                # Plan-specific button: read selected plan from select entity
+                plan_id = self._get_plan_id(desc.select_key)
+                await desc.plan_fn(self.device, plan_id)
+                _LOGGER.debug(
+                    "Button '%s' pressed for plan %d on %s",
+                    desc.name, plan_id, self.device.name,
+                )
+            else:
+                # Standard button
+                await desc.set_fn(self.device)
+                _LOGGER.debug("Successfully pressed button: %s", desc.name)
+
             await self.device.refresh()
-            _LOGGER.debug(
-                "Feeding plan button '%s' pressed for plan %d on %s",
-                self.name, plan_id, self.device.name,
-            )
+
         except HomeAssistantError:
             raise
         except Exception as e:
             _LOGGER.error(
-                "Error pressing feeding plan button '%s' for device %s: %s",
-                self.name, self.device.name, e, exc_info=True,
+                "Error pressing button %s for device %s: %s",
+                desc.name, self.device.name, e,
+                exc_info=True,
             )
 
 
@@ -570,7 +621,6 @@ async def async_setup_entry(
     devices = hub.devices
     _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Standard buttons from the device map
     entities = [
         PetLibroButtonEntity(device, hub, description)
         for device in devices.values()
@@ -579,63 +629,14 @@ async def async_setup_entry(
         for description in entity_descriptions
     ]
 
-    # Feeding plan action buttons for dry feeders
-    for device in devices.values():
-        if hasattr(device, "feeding_plan_data"):
-            entities.extend([
-                FeedingPlanButtonEntity(
-                    device, hub,
-                    key="feeding_plan_enable",
-                    name="Enable Selected Plan",
-                    icon="mdi:calendar-check",
-                    action_fn=lambda d, pid: d.api.feeding_plan_toggle(
-                        d.serial,
-                        {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
-                    ),
-                    select_key="feeding_plan_select",
-                ),
-                FeedingPlanButtonEntity(
-                    device, hub,
-                    key="feeding_plan_disable",
-                    name="Disable Selected Plan",
-                    icon="mdi:calendar-remove",
-                    action_fn=lambda d, pid: d.api.feeding_plan_toggle(
-                        d.serial,
-                        {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
-                    ),
-                    select_key="feeding_plan_select",
-                ),
-                FeedingPlanButtonEntity(
-                    device, hub,
-                    key="feeding_plan_delete",
-                    name="Delete Selected Plan",
-                    icon="mdi:calendar-minus",
-                    action_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
-                    select_key="feeding_plan_select",
-                ),
-                FeedingPlanButtonEntity(
-                    device, hub,
-                    key="feeding_plan_skip_today",
-                    name="Skip Selected Plan Today",
-                    icon="mdi:calendar-today",
-                    action_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
-                    select_key="feeding_plan_today_select",
-                ),
-                FeedingPlanButtonEntity(
-                    device, hub,
-                    key="feeding_plan_unskip_today",
-                    name="Un-skip Selected Plan Today",
-                    icon="mdi:calendar-today",
-                    action_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
-                    select_key="feeding_plan_today_select",
-                ),
-            ])
-
     if not entities:
         _LOGGER.warning("No buttons added, entities list is empty!")
     else:
         _LOGGER.debug("Adding %d PetLibro buttons", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding button entity: %s for device %s", entity.entity_description.name if hasattr(entity, 'entity_description') else entity.name, entity.device.name)
-
+            _LOGGER.debug(
+                "Adding button entity: %s for device %s",
+                entity.entity_description.name,
+                entity.device.name,
+            )
         async_add_entities(entities)

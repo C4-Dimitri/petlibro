@@ -1573,6 +1573,13 @@ class PetLibroAPI:
             "petIds": [],
         })
 
+    async def feeding_plan_today_all(self, serial: str, enable: bool) -> None:
+        """Enable or disable ALL feeding plan events for today."""
+        await self.session.post("/device/feedingPlan/enableTodayAll", json={
+            "deviceSn": serial,
+            "enable": enable,
+        })
+
 ## Added this to fix dupe logs
 class PetLibroDataCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api):
