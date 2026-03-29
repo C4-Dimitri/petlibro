@@ -1,51 +1,9 @@
-enable_feeding_plan:
-  name: Enable Feeding Plan
-  description: >
-    Enable the feeding plan currently selected on the feeder's 'Feeding Plan'
-    entity. Select the plan you want to enable from that dropdown first.
-  fields:
-    device_id:
-      name: Device
-      description: The feeder to target.
-      required: true
-      selector:
-        device:
-          integration: petlibro
-
-disable_feeding_plan:
-  name: Disable Feeding Plan
-  description: >
-    Disable the feeding plan currently selected on the feeder's 'Feeding Plan'
-    entity. Select the plan you want to disable from that dropdown first.
-  fields:
-    device_id:
-      name: Device
-      description: The feeder to target.
-      required: true
-      selector:
-        device:
-          integration: petlibro
-
-delete_feeding_plan:
-  name: Delete Feeding Plan
-  description: >
-    Permanently delete the feeding plan currently selected on the feeder's
-    'Feeding Plan' entity. Select the plan you want to delete from that dropdown first.
-  fields:
-    device_id:
-      name: Device
-      description: The feeder to target.
-      required: true
-      selector:
-        device:
-          integration: petlibro
-
 edit_feeding_plan:
   name: Edit Feeding Plan
   description: >
-    Edit the feeding plan currently selected on the feeder's 'Feeding Plan'
-    entity. Select the plan you want to edit from that dropdown first.
+    Edit an existing scheduled feeding plan on a dry food feeder.
     Only the fields you provide will be changed — anything left blank keeps its current value.
+    Find the Plan ID in the feeder's Feeding Schedule sensor attributes.
   fields:
     device_id:
       name: Device
@@ -54,6 +12,17 @@ edit_feeding_plan:
       selector:
         device:
           integration: petlibro
+    plan_id:
+      name: Plan ID
+      description: >
+        The ID of the plan to edit. Find this in the feeder's
+        Feeding Schedule sensor attributes (planID field).
+      required: true
+      selector:
+        number:
+          min: 1
+          max: 99999999
+          mode: box
     time:
       name: Time
       description: "New feed time (e.g. 08:00)."
@@ -68,7 +37,7 @@ edit_feeding_plan:
         number:
           min: 1
           max: 48
-          mode: slider
+          mode: box
     label:
       name: Label
       description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
@@ -130,7 +99,7 @@ add_feeding_plan:
         number:
           min: 1
           max: 48
-          mode: slider
+          mode: box
     label:
       name: Label
       description: "A name for this feeding plan. No spaces allowed (e.g. MorningFeed)."
@@ -166,31 +135,3 @@ add_feeding_plan:
       required: false
       selector:
         boolean:
-
-enable_today_feeding_plan:
-  name: Enable Today's Feeding Plan
-  description: >
-    Un-skip the plan currently selected on the feeder's "Today's Feeding Plan"
-    entity. Select the plan you want to un-skip from that dropdown first.
-  fields:
-    device_id:
-      name: Device
-      description: The feeder to target.
-      required: true
-      selector:
-        device:
-          integration: petlibro
-
-disable_today_feeding_plan:
-  name: Disable Today's Feeding Plan
-  description: >
-    Skip the plan currently selected on the feeder's "Today's Feeding Plan"
-    entity. Select the plan you want to skip from that dropdown first.
-  fields:
-    device_id:
-      name: Device
-      description: The feeder to target.
-      required: true
-      selector:
-        device:
-          integration: petlibro

@@ -1,5 +1,6 @@
 """Support for PETLIBRO buttons."""
 from __future__ import annotations
+import re
 from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
@@ -11,6 +12,8 @@ from .const import DOMAIN
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.config_entries import ConfigEntry  # Added ConfigEntry import
 from .hub import PetLibroHub  # Adjust the import path as necessary
@@ -451,6 +454,7 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
     ],
 }
 
+
 class PetLibroButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
     """PETLIBRO button entity."""
     entity_description: PetLibroButtonEntityDescription[_DeviceT]
@@ -463,60 +467,175 @@ class PetLibroButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
     async def async_press(self) -> None:
         """Handle the button press."""
         _LOGGER.debug("Pressing button: %s for device %s", self.entity_description.name, self.device.name)
-
-        # Log available methods for debugging
         _LOGGER.debug("Available methods for device %s: %s", self.device.name, dir(self.device))
 
         try:
             await self.entity_description.set_fn(self.device)
-            await self.device.refresh()  # Refresh the device state after the button press
+            await self.device.refresh()
             _LOGGER.debug("Successfully pressed button: %s", self.entity_description.name)
         except Exception as e:
             _LOGGER.error(
                 f"Error pressing button {self.entity_description.name} for device {self.device.name}: {e}",
-                exc_info=True  # Log full traceback for better debugging
+                exc_info=True
             )
+
+class FeedingPlanButtonEntity(PetLibroEntity[_DeviceT], ButtonEntity):
+    """Button that acts on whichever feeding plan is currently selected in
+    the companion select entity.
+
+    action_fn:  async callable(device, plan_id) — the API action to perform.
+    select_key: unique_id suffix of the select entity to read from,
+                either 'feeding_plan_select' or 'feeding_plan_today_select'.
+    """
+
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(self, device, hub, key: str, name: str, icon: str,
+                 action_fn, select_key: str) -> None:
+        desc = PetLibroEntityDescription(key=key, name=name)
+        super().__init__(device, hub, desc)
+        self._attr_unique_id = f"{device.serial}-{key}"
+        self._attr_icon = icon
+        self._action_fn = action_fn
+        self._select_key = select_key
+
+    @property
+    def available(self) -> bool:
+        """Check if the device is available."""
+        return getattr(self.device, 'online', False)
+
+    def _get_plan_id(self) -> int:
+        """Read the currently selected plan ID from the companion select entity."""
+        ent_reg = er.async_get(self.hass)
+        unique_id = f"{self.device.serial}-{self._select_key}"
+        entity_id = ent_reg.async_get_entity_id("select", DOMAIN, unique_id)
+
+        if not entity_id:
+            raise HomeAssistantError(
+                f"No feeding plan selector found for {self.device.name}. "
+                "Make sure the integration has loaded correctly."
+            )
+
+        state = self.hass.states.get(entity_id)
+        if not state or state.state in ("unknown", "unavailable", "No plans", "No plans today"):
+            raise HomeAssistantError(
+                f"No plan selected on {self.device.name}. "
+                "Select a plan from the feeding plan dropdown first."
+            )
+
+        match = re.search(r"-\s*(\d+)\s*$", state.state)
+        if not match:
+            raise HomeAssistantError(
+                f"Could not extract a plan ID from '{state.state}'."
+            )
+
+        return int(match.group(1))
+
+    async def async_press(self) -> None:
+        """Handle button press — act on the currently selected plan."""
+        try:
+            plan_id = self._get_plan_id()
+            await self._action_fn(self.device, plan_id)
+            await self.device.refresh()
+            _LOGGER.debug(
+                "Feeding plan button '%s' pressed for plan %d on %s",
+                self.name, plan_id, self.device.name,
+            )
+        except HomeAssistantError:
+            raise
+        except Exception as e:
+            _LOGGER.error(
+                "Error pressing feeding plan button '%s' for device %s: %s",
+                self.name, self.device.name, e, exc_info=True,
+            )
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: ConfigEntry,  # Use ConfigEntry
+    entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up PETLIBRO buttons using config entry."""
-    # Retrieve the hub from hass.data that was set up in __init__.py
     hub: PetLibroHub = hass.data[DOMAIN].get(entry.entry_id)
 
     if not hub:
         _LOGGER.error("Hub not found for entry: %s", entry.entry_id)
         return
 
-    # Ensure that the devices are loaded
     if not hub.devices:
         _LOGGER.warning("No devices found in hub during button setup.")
         return
 
-    # Log the contents of the hub data for debugging
     _LOGGER.debug("Hub data: %s", hub)
-
-    devices = hub.devices  # Devices should already be loaded in the hub
+    devices = hub.devices
     _LOGGER.debug("Devices in hub: %s", devices)
 
-    # Create button entities for each device based on the button map
+    # Standard buttons from the device map
     entities = [
         PetLibroButtonEntity(device, hub, description)
-        for device in devices.values()  # Iterate through devices from the hub
+        for device in devices.values()
         for device_type, entity_descriptions in DEVICE_BUTTON_MAP.items()
         if isinstance(device, device_type)
         for description in entity_descriptions
     ]
 
+    # Feeding plan action buttons for dry feeders
+    for device in devices.values():
+        if hasattr(device, "feeding_plan_data"):
+            entities.extend([
+                FeedingPlanButtonEntity(
+                    device, hub,
+                    key="feeding_plan_enable",
+                    name="Enable Selected Plan",
+                    icon="mdi:calendar-check",
+                    action_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                        d.serial,
+                        {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+                    ),
+                    select_key="feeding_plan_select",
+                ),
+                FeedingPlanButtonEntity(
+                    device, hub,
+                    key="feeding_plan_disable",
+                    name="Disable Selected Plan",
+                    icon="mdi:calendar-remove",
+                    action_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                        d.serial,
+                        {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+                    ),
+                    select_key="feeding_plan_select",
+                ),
+                FeedingPlanButtonEntity(
+                    device, hub,
+                    key="feeding_plan_delete",
+                    name="Delete Selected Plan",
+                    icon="mdi:calendar-minus",
+                    action_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+                    select_key="feeding_plan_select",
+                ),
+                FeedingPlanButtonEntity(
+                    device, hub,
+                    key="feeding_plan_skip_today",
+                    name="Skip Selected Plan Today",
+                    icon="mdi:calendar-today",
+                    action_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+                    select_key="feeding_plan_today_select",
+                ),
+                FeedingPlanButtonEntity(
+                    device, hub,
+                    key="feeding_plan_unskip_today",
+                    name="Un-skip Selected Plan Today",
+                    icon="mdi:calendar-today",
+                    action_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+                    select_key="feeding_plan_today_select",
+                ),
+            ])
+
     if not entities:
         _LOGGER.warning("No buttons added, entities list is empty!")
     else:
-        # Log the number of entities and their details
         _LOGGER.debug("Adding %d PetLibro buttons", len(entities))
         for entity in entities:
-            _LOGGER.debug("Adding button entity: %s for device %s", entity.entity_description.name, entity.device.name)
+            _LOGGER.debug("Adding button entity: %s for device %s", entity.entity_description.name if hasattr(entity, 'entity_description') else entity.name, entity.device.name)
 
-        # Add button entities to Home Assistant
         async_add_entities(entities)
