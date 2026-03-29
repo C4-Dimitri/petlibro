@@ -53,82 +53,6 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
     plan_fn: Callable | None = None
 
 
-# ---------------------------------------------------------------------------
-# Feeding plan button helpers shared across dry feeders
-# ---------------------------------------------------------------------------
-
-_NOOP = lambda _: None  # noqa: E731 — no-op set_fn for plan buttons that use plan_fn instead
-
-
-def _plan_enable_buttons(device_type):
-    """Return the 7 feeding plan buttons for a dry feeder type."""
-    return [
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_enable",
-            translation_key="feeding_plan_enable",
-            icon="mdi:calendar-check",
-            name="Enable Selected Plan",
-            set_fn=_NOOP,
-            select_key="feeding_plan_select",
-            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
-                d.serial,
-                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
-            ),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_disable",
-            translation_key="feeding_plan_disable",
-            icon="mdi:calendar-remove",
-            name="Disable Selected Plan",
-            set_fn=_NOOP,
-            select_key="feeding_plan_select",
-            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
-                d.serial,
-                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
-            ),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_delete",
-            translation_key="feeding_plan_delete",
-            icon="mdi:calendar-minus",
-            name="Delete Selected Plan",
-            set_fn=_NOOP,
-            select_key="feeding_plan_select",
-            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_skip_today",
-            translation_key="feeding_plan_skip_today",
-            icon="mdi:calendar-today",
-            name="Skip Selected Plan Today",
-            set_fn=_NOOP,
-            select_key="feeding_plan_today_select",
-            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_unskip_today",
-            translation_key="feeding_plan_unskip_today",
-            icon="mdi:calendar-today",
-            name="Un-skip Selected Plan Today",
-            set_fn=_NOOP,
-            select_key="feeding_plan_today_select",
-            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_today_enable_all",
-            translation_key="feeding_plan_today_enable_all",
-            icon="mdi:calendar-check",
-            name="Enable All Plans Today",
-            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
-        ),
-        PetLibroButtonEntityDescription[device_type](
-            key="feeding_plan_today_disable_all",
-            translation_key="feeding_plan_today_disable_all",
-            icon="mdi:calendar-remove",
-            name="Disable All Plans Today",
-            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
-        ),
-    ]
 
 
 DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
@@ -165,7 +89,71 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_light_off(),
             name="Turn Off Indicator"
         ),
-        *_plan_enable_buttons(AirSmartFeeder),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[AirSmartFeeder](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
     ],
     GranarySmartFeeder: [
         PetLibroButtonEntityDescription[GranarySmartFeeder](
@@ -178,13 +166,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(True),
-            name="Enable Feeding Plan"
+            name="Enable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[GranarySmartFeeder](
             key="disable_feeding_plan",
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
-            name="Disable Feeding Plan"
+            name="Disable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[GranarySmartFeeder](
             key="light_on",
@@ -204,7 +192,71 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         ),
-        *_plan_enable_buttons(GranarySmartFeeder),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartFeeder](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
     ],
     GranarySmartCameraFeeder: [
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
@@ -217,13 +269,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(True),
-            name="Enable Feeding Plan"
+            name="Enable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
             key="disable_feeding_plan",
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
-            name="Disable Feeding Plan"
+            name="Disable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
             key="light_on",
@@ -243,7 +295,71 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Replaced"
         ),
-        *_plan_enable_buttons(GranarySmartCameraFeeder),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[GranarySmartCameraFeeder](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
     ],
     OneRFIDSmartFeeder: [
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
@@ -256,13 +372,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(True),
-            name="Enable Feeding Plan"
+            name="Enable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
             key="disable_feeding_plan",
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
-            name="Disable Feeding Plan"
+            name="Disable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
             key="manual_lid_open",
@@ -300,7 +416,71 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_desiccant_reset(),
             name="Desiccant Reset"
         ),
-        *_plan_enable_buttons(OneRFIDSmartFeeder),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[OneRFIDSmartFeeder](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
     ],
     PolarWetFoodFeeder: [
         PetLibroButtonEntityDescription[PolarWetFoodFeeder](
@@ -345,13 +525,13 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             key="enable_feeding_plan",
             translation_key="enable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(True),
-            name="Enable Feeding Plan"
+            name="Enable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
             key="disable_feeding_plan",
             translation_key="disable_feeding_plan",
             set_fn=lambda device: device.set_feeding_plan(False),
-            name="Disable Feeding Plan"
+            name="Disable Feeding Schedule"
         ),
         PetLibroButtonEntityDescription[SpaceSmartFeeder](
             key="sound_on",
@@ -389,7 +569,71 @@ DEVICE_BUTTON_MAP: dict[type[Device], list[PetLibroButtonEntityDescription]] = {
             set_fn=lambda device: device.set_sleep_off(),
             name="Turn Off Sleep Mode"
         ),
-        *_plan_enable_buttons(SpaceSmartFeeder),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_enable",
+            translation_key="feeding_plan_enable",
+            icon="mdi:calendar-check",
+            name="Enable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": True},
+            ),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_disable",
+            translation_key="feeding_plan_disable",
+            icon="mdi:calendar-remove",
+            name="Disable Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
+                d.serial,
+                {**d.feeding_plan_data.get(str(pid), {}), "id": pid, "enable": False},
+            ),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_delete",
+            translation_key="feeding_plan_delete",
+            icon="mdi:calendar-minus",
+            name="Delete Selected Plan",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_skip_today",
+            translation_key="feeding_plan_skip_today",
+            icon="mdi:calendar-today",
+            name="Skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_unskip_today",
+            translation_key="feeding_plan_unskip_today",
+            icon="mdi:calendar-today",
+            name="Un-skip Selected Plan Today",
+            set_fn=lambda _: None,
+            select_key="feeding_plan_today_select",
+            plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_today_enable_all",
+            translation_key="feeding_plan_today_enable_all",
+            icon="mdi:calendar-check",
+            name="Enable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, True),
+        ),
+        PetLibroButtonEntityDescription[SpaceSmartFeeder](
+            key="feeding_plan_today_disable_all",
+            translation_key="feeding_plan_today_disable_all",
+            icon="mdi:calendar-remove",
+            name="Disable Today's Feeding Schedule",
+            set_fn=lambda d: d.api.feeding_plan_today_all(d.serial, False),
+        ),
     ],
     DockstreamSmartFountain: [
         PetLibroButtonEntityDescription[DockstreamSmartFountain](
