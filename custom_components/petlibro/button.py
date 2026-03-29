@@ -5,8 +5,8 @@ from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
-from dataclasses import dataclass, field
-from typing import Any, Generic
+from dataclasses import dataclass
+from typing import Any
 from logging import getLogger
 from .const import DOMAIN
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
@@ -38,15 +38,11 @@ from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 
 
 @dataclass(frozen=True)
-class RequiredKeysMixin(Generic[_DeviceT]):
-    """A class that describes devices button entity required keys."""
-    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]] = field(default=lambda _: None)
-
-
-@dataclass(frozen=True)
-class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT], RequiredKeysMixin[_DeviceT]):
+class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT]):
     """A class that describes device button entities."""
     entity_category: EntityCategory = EntityCategory.CONFIG
+    # Standard button action — async callable(device)
+    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]] | None = None
     # For feeding plan buttons: read plan_id from this select entity unique_id suffix
     select_key: str | None = None
     # Async callable(device, plan_id) — used when select_key is set
