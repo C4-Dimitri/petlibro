@@ -6,7 +6,7 @@ import aiohttp
 from aiohttp import ClientSession, ClientError
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Generic
 from logging import getLogger
 from .const import DOMAIN
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
@@ -38,11 +38,15 @@ from .devices.litterboxes.luma_smart_litter_box import LumaSmartLitterBox
 
 
 @dataclass(frozen=True)
-class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT]):
+class RequiredKeysMixin(Generic[_DeviceT]):
+    """A class that describes devices button entity required keys."""
+    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]]
+
+
+@dataclass(frozen=True)
+class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDescription[_DeviceT], RequiredKeysMixin[_DeviceT]):
     """A class that describes device button entities."""
     entity_category: EntityCategory = EntityCategory.CONFIG
-    # Standard button action — async callable(device)
-    set_fn: Callable[[_DeviceT], Coroutine[Any, Any, None]] | None = None
     # For feeding plan buttons: read plan_id from this select entity unique_id suffix
     select_key: str | None = None
     # Async callable(device, plan_id) — used when select_key is set
@@ -53,6 +57,9 @@ class PetLibroButtonEntityDescription(ButtonEntityDescription, PetLibroEntityDes
 # Feeding plan button helpers shared across dry feeders
 # ---------------------------------------------------------------------------
 
+_NOOP = lambda _: None  # noqa: E731 — no-op set_fn for plan buttons that use plan_fn instead
+
+
 def _plan_enable_buttons(device_type):
     """Return the 7 feeding plan buttons for a dry feeder type."""
     return [
@@ -61,6 +68,7 @@ def _plan_enable_buttons(device_type):
             translation_key="feeding_plan_enable",
             icon="mdi:calendar-check",
             name="Enable Selected Plan",
+            set_fn=_NOOP,
             select_key="feeding_plan_select",
             plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
                 d.serial,
@@ -72,6 +80,7 @@ def _plan_enable_buttons(device_type):
             translation_key="feeding_plan_disable",
             icon="mdi:calendar-remove",
             name="Disable Selected Plan",
+            set_fn=_NOOP,
             select_key="feeding_plan_select",
             plan_fn=lambda d, pid: d.api.feeding_plan_toggle(
                 d.serial,
@@ -83,6 +92,7 @@ def _plan_enable_buttons(device_type):
             translation_key="feeding_plan_delete",
             icon="mdi:calendar-minus",
             name="Delete Selected Plan",
+            set_fn=_NOOP,
             select_key="feeding_plan_select",
             plan_fn=lambda d, pid: d.api.feeding_plan_delete(d.serial, pid),
         ),
@@ -91,6 +101,7 @@ def _plan_enable_buttons(device_type):
             translation_key="feeding_plan_skip_today",
             icon="mdi:calendar-today",
             name="Skip Selected Plan Today",
+            set_fn=_NOOP,
             select_key="feeding_plan_today_select",
             plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=True),
         ),
@@ -99,6 +110,7 @@ def _plan_enable_buttons(device_type):
             translation_key="feeding_plan_unskip_today",
             icon="mdi:calendar-today",
             name="Un-skip Selected Plan Today",
+            set_fn=_NOOP,
             select_key="feeding_plan_today_select",
             plan_fn=lambda d, pid: d.api.feeding_plan_today_skip(d.serial, pid, skip=False),
         ),
