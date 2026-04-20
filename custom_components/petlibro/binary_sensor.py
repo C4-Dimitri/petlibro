@@ -1,5 +1,6 @@
 """Support for PETLIBRO binary sensors."""
 from __future__ import annotations
+import json
 from .api import make_api_call
 import aiohttp
 from aiohttp import ClientSession, ClientError
@@ -90,15 +91,25 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         """Return entity specific state attributes."""
         match self.key:
             case "feeding_plan_state":
-                # Today's feeding schedule events with amounts in all units
+                # Today's feeding schedule events as a list with all unit amounts
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 if not plans:
-                    return {}
+                    return {"feed_conv_factor": getattr(self.device, "feed_conv_factor", 1), "schedule_type": "today", "schedule": []}
                 plan_data = getattr(self.device, "feeding_plan_data", {})
                 conv = getattr(self.device, "feed_conv_factor", 1)
-                return {
-                    plan_data.get(str(plan["planId"]), {}).get("label") or f"plan_{plan.get('index', plan['planId'])}": {
+                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 6: "Unknown"}
+                schedule = []
+                for plan in plans:
+                    full = plan_data.get(str(plan["planId"]), {})
+                    raw_repeat = full.get("repeatDay", "[]")
+                    try:
+                        repeat_list = json.loads(raw_repeat) if isinstance(raw_repeat, str) else raw_repeat
+                    except (json.JSONDecodeError, TypeError):
+                        repeat_list = []
+                    raw_state = plan.get("state")
+                    schedule.append({
+                        "label": full.get("label") or f"plan_{plan.get('index', plan['planId'])}",
                         "planID": plan.get("planId"),
                         "time": plan.get("time"),
                         **{
@@ -106,44 +117,52 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                             for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
                         },
                         "amount_raw": plan.get("grainNum", 0),
-                        "feed_conv_factor": conv,
-                        "enabled": plan_data.get(str(plan["planId"]), {}).get("enable", False),
-                        "repeat_days": plan_data.get(str(plan["planId"]), {}).get("repeatDay", "[]"),
-                        "sound": plan_data.get(str(plan["planId"]), {}).get("enableAudio", False),
-                        "feed_state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(plan.get("state"), "Unknown"),
+                        "enabled": full.get("enable", False),
+                        "repeat_days": repeat_list,
+                        "sound": full.get("enableAudio", False),
+                        "feed_state": state_map.get(raw_state, "Unknown"),
+                        "feed_state_raw": raw_state,
                         "repeat": plan.get("repeat"),
-                    }
-                    for plan in plans
-                } or {}
+                    })
+                return {"feed_conv_factor": conv, "schedule_type": "today", "schedule": schedule}
             case "feeding_schedule":
-                # Full recurring schedule with amounts in all units + today's state
+                # Full recurring schedule as a list with all unit amounts + today's state
                 plans = getattr(self.device, "feeding_plan_data", {})
                 if not plans:
-                    return {}
+                    return {"feed_conv_factor": getattr(self.device, "feed_conv_factor", 1), "schedule_type": "full", "schedule": []}
                 conv = getattr(self.device, "feed_conv_factor", 1)
                 # Build lookup of today's feed states by planId
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 today_plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 today_state_map = {p["planId"]: p.get("state") for p in today_plans}
-                return {
-                    plan.get("label") or f"plan_{plan_id}": {
-                        "planID": int(plan_id),
+                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 6: "Unknown"}
+                schedule = []
+                for plan_id, plan in plans.items():
+                    raw_repeat = plan.get("repeatDay", "[]")
+                    try:
+                        repeat_list = json.loads(raw_repeat) if isinstance(raw_repeat, str) else raw_repeat
+                    except (json.JSONDecodeError, TypeError):
+                        repeat_list = []
+                    pid = int(plan_id)
+                    in_today = pid in today_state_map
+                    raw_state = today_state_map.get(pid) if in_today else 0
+                    feed_state = state_map.get(raw_state, "Unknown") if in_today else "Not Scheduled Today"
+                    schedule.append({
+                        "label": plan.get("label") or f"plan_{plan_id}",
+                        "planID": pid,
                         "time": plan.get("executionTime"),
                         **{
                             f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
                             for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
                         },
                         "amount_raw": plan.get("grainNum", 0),
-                        "feed_conv_factor": conv,
                         "enabled": plan.get("enable", False),
-                        "repeat_days": plan.get("repeatDay", "[]"),
+                        "repeat_days": repeat_list,
                         "sound": plan.get("enableAudio", False),
-                        "feed_state": {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed"}.get(
-                            today_state_map.get(int(plan_id)), "Not Scheduled Today"
-                        ),
-                    }
-                    for plan_id, plan in plans.items()
-                } or {}
+                        "feed_state": feed_state,
+                        "feed_state_raw": raw_state,
+                    })
+                return {"feed_conv_factor": conv, "schedule_type": "full", "schedule": schedule}
         return {}
 
 
