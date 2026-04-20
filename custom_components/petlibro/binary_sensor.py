@@ -161,7 +161,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         "repeat_days": repeat_list,
                         "sound": plan.get("enableAudio", False),
                         "state_label": state_map.get(raw_state, "Unknown"),
-                        "state ": raw_state_map.get(raw_state, "unknown"),
+                        "state": raw_state_map.get(raw_state, "unknown"),
                     })
                 return {"feed_conv_factor": conv, "schedule_type": "full", "schedule": schedule}
         return {}
