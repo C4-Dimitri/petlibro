@@ -121,8 +121,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         "enabled": full.get("enable", False),
                         "repeat_days": repeat_list,
                         "sound": full.get("enableAudio", False),
-                        "feed_state": state_map.get(raw_state, "Unknown"),
-                        "feed_state_raw": raw_state_map.get(raw_state, "unknown"),
+                        "state_label": state_map.get(raw_state, "Unknown"),
+                        "state": raw_state_map.get(raw_state, "unknown"),
                         "repeat": plan.get("repeat"),
                     })
                 return {"feed_conv_factor": conv, "schedule_type": "today", "schedule": schedule}
@@ -160,8 +160,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         "enabled": plan.get("enable", False),
                         "repeat_days": repeat_list,
                         "sound": plan.get("enableAudio", False),
-                        "feed_state": state_map.get(raw_state, "Unknown"),
-                        "feed_state_raw": raw_state_map.get(raw_state, "unknown"),
+                        "state_label": state_map.get(raw_state, "Unknown"),
+                        "state ": raw_state_map.get(raw_state, "unknown"),
                     })
                 return {"feed_conv_factor": conv, "schedule_type": "full", "schedule": schedule}
         return {}
