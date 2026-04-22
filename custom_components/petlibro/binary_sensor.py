@@ -10,6 +10,7 @@ from functools import cached_property
 from typing import Optional
 import logging
 from .const import DOMAIN, Unit, APIKey as API, VALID_UNIT_TYPES
+from homeassistant.util.dt import now as ha_now
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
@@ -90,55 +91,20 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
         match self.key:
-            case "feeding_plan_state":
-                # Today's feeding schedule events as a list with all unit amounts
-                today_data = getattr(self.device, "feeding_plan_today_data", {})
-                plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
-                if not plans:
-                    return {"feed_conv_factor": getattr(self.device, "feed_conv_factor", 1), "schedule_type": "today", "schedule": []}
-                plan_data = getattr(self.device, "feeding_plan_data", {})
-                conv = getattr(self.device, "feed_conv_factor", 1)
-                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 5: "State 5", 6: "Unknown", 0: "Not in Today's Schedule"}
-                raw_state_map = {1: "pending", 2: "to_be_skipped", 3: "dispensed", 4: "skipped", 5: "state_5", 6: "unknown", 0: "not_for_today"}
-                schedule = []
-                for plan in plans:
-                    full = plan_data.get(str(plan["planId"]), {})
-                    raw_repeat = full.get("repeatDay", "[]")
-                    try:
-                        repeat_list = json.loads(raw_repeat) if isinstance(raw_repeat, str) else raw_repeat
-                    except (json.JSONDecodeError, TypeError):
-                        repeat_list = []
-                    raw_state = plan.get("state")
-                    schedule.append({
-                        "label": full.get("label") or f"plan_{plan.get('index', plan['planId'])}",
-                        "planID": plan.get("planId"),
-                        "time": plan.get("time"),
-                        **{
-                            f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
-                            for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
-                        },
-                        "amount_raw": plan.get("grainNum", 0),
-                        "enabled": full.get("enable", False),
-                        "repeat_days": repeat_list,
-                        "sound": full.get("enableAudio", False),
-                        "state_label": state_map.get(raw_state, "Unknown"),
-                        "state": raw_state_map.get(raw_state, "unknown"),
-                        "repeat": plan.get("repeat"),
-                    })
-                return {"feed_conv_factor": conv, "schedule_type": "today", "schedule": schedule}
             case "feeding_schedule":
                 # Full recurring schedule as a list with all unit amounts + today's state
                 plans = getattr(self.device, "feeding_plan_data", {})
-                if not plans:
-                    return {"feed_conv_factor": getattr(self.device, "feed_conv_factor", 1), "schedule_type": "full", "schedule": []}
                 conv = getattr(self.device, "feed_conv_factor", 1)
-                # Build lookup of today's feed states by planId
+                today_weekday = ha_now().isoweekday()  # 1=Mon … 7=Sun, matches repeatDay format
+                # Build lookup of today's feed states and data by planId
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 today_plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 today_state_map = {p["planId"]: p.get("state") for p in today_plans}
-                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 5: "State 5", 6: "Unknown", 0: "Not in Today's Schedule"}
-                raw_state_map = {1: "pending", 2: "to_be_skipped", 3: "dispensed", 4: "skipped", 5: "state_5", 6: "unknown", 0: "not_for_today"}
+                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 5: "State 5", 6: "Unknown"}
+                raw_state_map = {1: "pending", 2: "to_be_skipped", 3: "dispensed", 4: "skipped", 5: "state_5", 6: "unknown"}
                 schedule = []
+                seen_plan_ids = set()
+                # First pass: plans from the full schedule list
                 for plan_id, plan in plans.items():
                     raw_repeat = plan.get("repeatDay", "[]")
                     try:
@@ -146,11 +112,22 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     except (json.JSONDecodeError, TypeError):
                         repeat_list = []
                     pid = int(plan_id)
+                    seen_plan_ids.add(pid)
                     in_today = pid in today_state_map
-                    raw_state = today_state_map.get(pid) if in_today else 0
+                    today = in_today or (today_weekday in repeat_list)
+                    if in_today:
+                        raw_state = today_state_map.get(pid)
+                        state = raw_state_map.get(raw_state, "unknown")
+                        state_label = state_map.get(raw_state, "Unknown")
+                    elif not repeat_list:
+                        state = "not_recurring"
+                        state_label = "Not Recurring"
+                    else:
+                        state = None
+                        state_label = None
                     schedule.append({
                         "label": plan.get("label") or f"plan_{plan_id}",
-                        "planID": pid,
+                        "id": pid,
                         "time": plan.get("executionTime"),
                         **{
                             f"amount_{unit.symbol.lower()}": Unit.convert_feed(plan.get("grainNum", 0) * conv, None, unit, True)
@@ -160,10 +137,35 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         "enabled": plan.get("enable", False),
                         "repeat_days": repeat_list,
                         "sound": plan.get("enableAudio", False),
+                        "today": today,
+                        "state_label": state_label,
+                        "state": state,
+                    })
+                # Second pass: today-only plans not in the full schedule (e.g. non-recurring one-time feeds)
+                for tp in today_plans:
+                    pid = tp["planId"]
+                    if pid in seen_plan_ids:
+                        continue
+                    raw_state = tp.get("state")
+                    schedule.append({
+                        "label": f"plan_{pid}",
+                        "id": pid,
+                        "time": tp.get("time"),
+                        **{
+                            f"amount_{unit.symbol.lower()}": Unit.convert_feed(tp.get("grainNum", 0) * conv, None, unit, True)
+                            for unit in VALID_UNIT_TYPES[API.FEED_UNIT] if unit
+                        },
+                        "amount_raw": tp.get("grainNum", 0),
+                        "enabled": True,
+                        "repeat_days": [],
+                        "sound": False,
+                        "today": True,
                         "state_label": state_map.get(raw_state, "Unknown"),
                         "state": raw_state_map.get(raw_state, "unknown"),
                     })
-                return {"feed_conv_factor": conv, "schedule_type": "full", "schedule": schedule}
+                if not schedule:
+                    return {"feed_conv_factor": conv, "schedule": []}
+                return {"feed_conv_factor": conv, "schedule": schedule}
         return {}
 
 
@@ -223,6 +225,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[AirSmartFeeder](
@@ -288,6 +291,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartFeeder](
@@ -353,6 +357,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[GranarySmartCameraFeeder](
@@ -449,6 +454,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[OneRFIDSmartFeeder](
@@ -514,6 +520,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
     ],
@@ -593,6 +600,7 @@ DEVICE_BINARY_SENSOR_MAP: dict[type[Device], list[PetLibroBinarySensorEntityDesc
             icon="mdi:calendar-check",
             device_class=BinarySensorDeviceClass.RUNNING,
             should_report=lambda device: device.feeding_plan_state is not None,
+            value_fn=lambda device: not device.feeding_plan_today_data.get("allSkipped", False),
             name="Today's Feeding Schedule"
         ),
         PetLibroBinarySensorEntityDescription[SpaceSmartFeeder](

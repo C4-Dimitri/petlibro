@@ -433,7 +433,20 @@
                 "name": "Today's Feeding Schedule"
             },
             "feeding_schedule": {
-                "name": "Feeding Schedule"
+                "name": "Feeding Schedule",
+                "state_attributes": {
+                    "state": {
+                        "state": {
+                            "pending": "Pending",
+                            "to_be_skipped": "Skipped",
+                            "dispensed": "Completed",
+                            "skipped": "Skipped, Time Passed",
+                            "state_5": "State 5",
+                            "unknown": "Unknown",
+                            "not_recurring": "Not Recurring"
+                        }
+                    }
+                }
             }
         },
         "number": {
@@ -506,10 +519,10 @@
                 "name": "Manual Feed Quantity"
             },
             "feeding_plan_select": {
-                "name": "Feeding Schedule"
+                "name": "Feeding Plan"
             },
             "feeding_plan_today_select": {
-                "name": "Today's Feeding Schedule"
+                "name": "Today's Feeding Plan"
             },
             "vacuum_mode": {
                 "name": "Vacuum Mode"
