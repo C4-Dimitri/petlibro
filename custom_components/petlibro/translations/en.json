@@ -439,7 +439,7 @@
                         "state": {
                             "pending": "Pending",
                             "to_be_skipped": "Skipped",
-                            "dispensed": "Completed",
+                            "dispensed": "Dispensed",
                             "skipped": "Skipped, Time Passed",
                             "state_5": "State 5",
                             "unknown": "Unknown",
