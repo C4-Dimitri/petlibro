@@ -442,8 +442,7 @@
                             "dispensed": "Dispensed",
                             "skipped": "Skipped, Time Passed",
                             "state_5": "State 5",
-                            "unknown": "Unknown",
-                            "not_recurring": "Not Recurring"
+                            "unknown": "Unknown"
                         }
                     }
                 }

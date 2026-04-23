@@ -100,8 +100,10 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 today_plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 today_state_map = {p["planId"]: p.get("state") for p in today_plans}
-                state_map = {1: "Pending", 2: "Skipped", 3: "Completed", 4: "Skipped, Time Passed", 5: "State 5", 6: "Unknown"}
+                state_map = {1: "Pending", 2: "Skipped", 3: "Dispensed", 4: "Skipped, Time Passed", 5: "State 5", 6: "Unknown"}
                 raw_state_map = {1: "pending", 2: "to_be_skipped", 3: "dispensed", 4: "skipped", 5: "state_5", 6: "unknown"}
+                # Reverse lookup: state key -> translatable label
+                state_label_map = {v: state_map[k] for k, v in raw_state_map.items()}
                 schedule = []
                 seen_plan_ids = set()
                 # First pass: plans from the full schedule list
@@ -118,13 +120,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     if in_today:
                         raw_state = today_state_map.get(pid)
                         state = raw_state_map.get(raw_state, "unknown")
-                        state_label = state_map.get(raw_state, "Unknown")
-                    elif not repeat_list:
-                        state = "not_recurring"
-                        state_label = "Not Recurring"
                     else:
-                        state = None
-                        state_label = None
+                        state = "pending"
                     schedule.append({
                         "label": plan.get("label") or f"plan_{plan_id}",
                         "id": pid,
@@ -135,10 +132,11 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         },
                         "amount_raw": plan.get("grainNum", 0),
                         "enabled": plan.get("enable", False),
+                        "recurring": bool(repeat_list),
                         "repeat_days": repeat_list,
                         "sound": plan.get("enableAudio", False),
                         "today": today,
-                        "state_label": state_label,
+                        "state_label": state_label_map.get(state, "Unknown"),
                         "state": state,
                     })
                 # Second pass: today-only plans not in the full schedule (e.g. non-recurring one-time feeds)
@@ -147,6 +145,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     if pid in seen_plan_ids:
                         continue
                     raw_state = tp.get("state")
+                    state = raw_state_map.get(raw_state, "unknown")
                     schedule.append({
                         "label": f"plan_{pid}",
                         "id": pid,
@@ -157,11 +156,12 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                         },
                         "amount_raw": tp.get("grainNum", 0),
                         "enabled": True,
+                        "recurring": False,
                         "repeat_days": [],
                         "sound": False,
                         "today": True,
-                        "state_label": state_map.get(raw_state, "Unknown"),
-                        "state": raw_state_map.get(raw_state, "unknown"),
+                        "state_label": state_label_map.get(state, "Unknown"),
+                        "state": state,
                     })
                 if not schedule:
                     return {"feed_conv_factor": conv, "schedule": []}
