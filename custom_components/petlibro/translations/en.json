@@ -429,23 +429,11 @@
             "water_state": {
                 "name": "Water Dispensing State"
             },
-            "feeding_plan_state": {
+            "today_feeding_schedule": {
                 "name": "Today's Feeding Schedule"
             },
             "feeding_schedule": {
-                "name": "Feeding Schedule",
-                "state_attributes": {
-                    "state": {
-                        "state": {
-                            "pending": "Pending",
-                            "to_be_skipped": "Skipped",
-                            "dispensed": "Dispensed",
-                            "skipped": "Skipped, Time Passed",
-                            "state_5": "State 5",
-                            "unknown": "Unknown"
-                        }
-                    }
-                }
+                "name": "Feeding Schedule"
             }
         },
         "number": {
