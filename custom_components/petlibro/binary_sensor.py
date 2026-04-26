@@ -87,6 +87,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
         self._last_state = state
         return bool(state)
 
+    @property
     def extra_state_attributes(self):
         """Return entity specific state attributes."""
         match self.key:
@@ -99,6 +100,7 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                 today_data = getattr(self.device, "feeding_plan_today_data", {})
                 today_plans = today_data.get("plans", []) if isinstance(today_data, dict) else []
                 today_state_map = {p["planId"]: p.get("state") for p in today_plans}
+                state_map = {1: "pending", 2: "to_be_skipped", 3: "dispensed", 4: "skipped", 5: "state_5", 6: "unknown"}
                 schedule = []
                 seen_plan_ids = set()
                 # First pass: plans from the full schedule list
@@ -114,10 +116,10 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     today = in_today or (today_weekday in repeat_list)
                     if in_today:
                         raw_state = today_state_map.get(pid)
+                        state = state_map.get(raw_state, "unknown")
                     else:
                         state = "pending"
                     schedule.append({
-                        "label": plan.get("label") or f"plan_{plan_id}",
                         "id": pid,
                         "label": plan.get("label", ""),
                         "time": plan.get("executionTime"),
@@ -139,8 +141,8 @@ class PetLibroBinarySensorEntity(PetLibroEntity[_DeviceT], BinarySensorEntity):
                     if pid in seen_plan_ids:
                         continue
                     raw_state = tp.get("state")
+                    state = state_map.get(raw_state, "unknown")
                     schedule.append({
-                        "label": f"plan_{pid}",
                         "id": pid,
                         "label": "",
                         "time": tp.get("time"),
